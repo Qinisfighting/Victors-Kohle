@@ -11,11 +11,20 @@ function App() {
     <>
       <div>
         <Day />
-        <Tabs defaultValue="account" className="w-[400px]">
-          <TabsList>
-            <TabsTrigger value="pocketMoney">Pocket Money</TabsTrigger>
-            <TabsTrigger value="savings">Savings</TabsTrigger>
-            <TabsTrigger value="signIn">Sign In</TabsTrigger>
+        <Tabs
+          defaultValue="account"
+          className="max-w-md bg-transparent border-none"
+        >
+          <TabsList className="flex justify-around gap-2">
+            <TabsTrigger value="pocketMoney" className="w-1/3">
+              Pocket Money
+            </TabsTrigger>
+            <TabsTrigger value="savings" className="w-1/3">
+              Savings
+            </TabsTrigger>
+            <TabsTrigger value="signIn" className="w-1/3">
+              Sign In
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="pocketMoney">
             <PocketMoney />
