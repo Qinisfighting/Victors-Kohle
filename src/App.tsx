@@ -12,18 +12,18 @@ function App() {
       <div>
         <Day />
         <Tabs
-          defaultValue="account"
+          defaultValue="pocketMoney"
           className="max-w-md bg-transparent border-none"
         >
           <TabsList className="flex justify-around gap-2">
             <TabsTrigger value="pocketMoney" className="w-1/3">
-              Pocket Money
+              Taschengeld
             </TabsTrigger>
             <TabsTrigger value="savings" className="w-1/3">
-              Savings
+              Spardose
             </TabsTrigger>
             <TabsTrigger value="signIn" className="w-1/3">
-              Sign In
+              Anmelden
             </TabsTrigger>
           </TabsList>
           <TabsContent value="pocketMoney">

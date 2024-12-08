@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
 
 const PocketMoney = () => {
   const weekdays = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
+    "Montag",
+    "Dienstag",
+    "Mittwoch",
+    "Donnerstag",
+    "Freitag",
+    "Samstag",
+    "Sonntag",
   ];
 
   const [selectedDay, setSelectedDay] = useState("");
@@ -21,25 +22,26 @@ const PocketMoney = () => {
   >([]);
 
   useEffect(() => {
-    const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
+    const today = new Date().toLocaleDateString("de-DE", { weekday: "long" });
     setSelectedDay(today);
   }, []);
 
   const handleCalculate = () => {
     const expense = parseFloat(dailyExpense);
+    const resultNumber = parseFloat(result);
 
     if (
       isNaN(expense) ||
       expense < 0 ||
-      isNaN(parseFloat(result)) ||
-      parseFloat(result) < 0
+      isNaN(resultNumber) ||
+      resultNumber < 0
     ) {
-      alert("Please enter a valid amount.");
+      alert("Gib bitte eine gültige Zahl ein.");
       return;
     }
 
     if (currentAmount - expense !== parseFloat(result)) {
-      alert("Ops, the result is wrong, try again!");
+      alert("Ups, die Berechnung ist falsch, versuch es nochmal!");
       return;
     }
 
@@ -63,17 +65,26 @@ const PocketMoney = () => {
     setCurrentAmount((prev) => prev + expenseToDelete);
   };
 
+  const formatToGerman = (value: number | bigint) => {
+    return new Intl.NumberFormat("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+
   const showCurrentAmount = () => {
-    return isNaN(currentAmount) ? "0.00" : currentAmount.toFixed(2);
+    return isNaN(currentAmount)
+      ? "0,00"
+      : formatToGerman(parseFloat(currentAmount.toFixed(2)));
   };
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
       <div className="flex items-center space-x-4 mb-4">
         <label className="font-medium mb-2 w-1/2 text-left">
-          Weekly Income (€):
+          Einkommen (€):
         </label>
-        <input
+        <Input
           type="number"
           value={startingAmount}
           onChange={(e) => {
@@ -87,20 +98,22 @@ const PocketMoney = () => {
           className="w-1/2 p-2 border border-gray-300 rounded-lg bg-white"
         />
       </div>
-
       {/* Expense List */}
       <ul className="mb-4">
         {expensesList.map((item, index) => (
           <li
             key={index}
-            className="flex justify-between items-center bg-gray-100 px-4 py-2 rounded-lg mb-2"
+            className="w-auto flex justify-between items-center bg-gray-100 px-2 rounded-lg mb-1"
           >
-            <span>
-              {item.day}: €{item.expense.toFixed(2)}
-            </span>
+            <div className="flex justify-between items-center w-5/6">
+              <span className="">{item.day}(€): </span>
+              <span className="">
+                - {formatToGerman(parseFloat(item.expense.toFixed(2)))}
+              </span>
+            </div>
             <button
               onClick={() => handleDelete(index)}
-              className="bg-transparent border-none"
+              className="bg-transparent border-none p-1"
             >
               🗑️
             </button>
@@ -111,7 +124,7 @@ const PocketMoney = () => {
       {/* Current Amount */}
       <div className="flex items-center space-x-4 mb-4">
         <span className="font-medium mb-2 w-1/2 text-left">
-          Current Amount (€):
+          Kontonstand (€):
         </span>
         <span className="w-1/2 text-left">{showCurrentAmount()}</span>
       </div>
@@ -120,7 +133,7 @@ const PocketMoney = () => {
         <select
           value={selectedDay}
           onChange={(e) => setSelectedDay(e.target.value)}
-          className="p-2 border border-gray-300 rounded-lg bg-white w-1/2"
+          className="p-1 border border-gray-300 rounded-lg bg-white w-1/2"
         >
           {weekdays.map((day) => (
             <option key={day} value={day}>
@@ -128,19 +141,24 @@ const PocketMoney = () => {
             </option>
           ))}
         </select>
-        <input
+        <Input
           type="number"
-          placeholder="€ Expense"
+          placeholder="€ Ausgaben"
+          onClick={() => setDailyExpense("")}
           value={dailyExpense}
           onChange={(e) => setDailyExpense(e.target.value)}
           className="p-2 border border-gray-300 rounded-lg w-1/2 bg-white"
         />
       </div>
       <div className="flex items-center space-x-4 mb-4">
-        <label className="font-medium mb-2 w-1/2 text-left">Result (€):</label>
-        <input
+        <label className="font-medium mb-2 w-1/2 text-left">
+          Ergebnis (€):
+        </label>
+        <Input
           type="number"
+          placeholder="Wie viel bleibt?"
           value={result}
+          onClick={() => setResult("")}
           onChange={(e) => setResult(e.target.value)}
           className="w-1/2 p-2 border border-gray-300 rounded-lg bg-white"
         />
@@ -150,7 +168,7 @@ const PocketMoney = () => {
         onClick={handleCalculate}
         className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg mb-4"
       >
-        Check Result
+        Ergebnis prüfen
       </button>
     </div>
   );

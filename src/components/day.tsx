@@ -4,8 +4,8 @@ const Day = () => {
   const today = new Date();
 
   // Get the formatted date and day
-  const dayOfWeek = today.toLocaleDateString("en-US", { weekday: "long" });
-  const formattedDate = today.toLocaleDateString("en-US", {
+  const dayOfWeek = today.toLocaleDateString("de-DE", { weekday: "long" });
+  const formattedDate = today.toLocaleDateString("de-DE", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -23,11 +23,11 @@ const Day = () => {
   return (
     <div className="flex items-center p-4">
       <div className="text-left w-1/2 ">
-        <div className="text-lg font-semibold text-gray-700">Today</div>
+        <div className="text-lg font-semibold text-gray-700">Heute</div>
         <div className="text-md text-gray-500">{formattedDate}</div>
       </div>
       <div className="text-right w-1/2">
-        <div className="text-sm text-gray-400">Week {weekOfYear} </div>
+        <div className="text-sm text-gray-400">Woche {weekOfYear} </div>
         <div className="text-3xl font-bold text-blue-600">{dayOfWeek}</div>
       </div>
     </div>
