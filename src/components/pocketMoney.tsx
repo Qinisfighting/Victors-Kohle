@@ -57,6 +57,10 @@ const PocketMoney = () => {
     setCurrentAmount((prev) => prev + expenseToDelete);
   };
 
+  const showCurrentAmount = () => {
+    return isNaN(currentAmount) ? "0.00" : currentAmount.toFixed(2);
+  };
+
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
       {/* Expense List */}
@@ -101,7 +105,6 @@ const PocketMoney = () => {
         />
       </div>
 
-      {/* Calculate Button */}
       <button
         onClick={handleCalculate}
         className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg mb-4"
@@ -109,16 +112,15 @@ const PocketMoney = () => {
         Calculate
       </button>
 
-      {/* Starting Amount */}
-      <div className="flex items-center  space-x-4 mb-4">
-        <label className="block font-medium mb-2 w-1/2">
-          Starting Amount (€):
+      <div className="flex items-center space-x-4 mb-4">
+        <label className="font-medium mb-2 w-1/2 text-left">
+          Week Start (€):
         </label>
         <input
           type="number"
           value={startingAmount}
           onChange={(e) => {
-            const newAmount = parseFloat(e.target.value) || 0;
+            const newAmount = parseFloat(e.target.value);
             setStartingAmount(newAmount);
             setCurrentAmount(
               newAmount -
@@ -131,7 +133,7 @@ const PocketMoney = () => {
 
       {/* Current Amount */}
       <h3 className="text-xl font-bold text-center">
-        Current Amount: €{currentAmount.toFixed(2)}
+        Current Amount: €{showCurrentAmount()}
       </h3>
     </div>
   );
