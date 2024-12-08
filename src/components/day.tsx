@@ -21,11 +21,15 @@ const Day = () => {
   const weekOfYear = getWeekOfYear(today);
 
   return (
-    <div className="flex flex-col items-center p-4">
-      <div className="text-lg font-semibold text-gray-700">Today</div>
-      <div className="text-2xl font-bold text-blue-600">{dayOfWeek}</div>
-      <div className="text-md text-gray-500">{formattedDate}</div>
-      <div className="text-sm text-gray-400">Week {weekOfYear} </div>
+    <div className="flex items-center p-4">
+      <div className="text-left w-1/2 ">
+        <div className="text-lg font-semibold text-gray-700">Today</div>
+        <div className="text-md text-gray-500">{formattedDate}</div>
+      </div>
+      <div className="text-right w-1/2">
+        <div className="text-sm text-gray-400">Week {weekOfYear} </div>
+        <div className="text-3xl font-bold text-blue-600">{dayOfWeek}</div>
+      </div>
     </div>
   );
 };
