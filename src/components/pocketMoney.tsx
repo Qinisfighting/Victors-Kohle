@@ -46,15 +46,29 @@ const PocketMoney = () => {
     }
 
     const newExpense = { day: selectedDay, expense };
-    const updatedList = [...expensesList, newExpense];
 
-    updatedList.sort(
-      (a, b) => weekdays.indexOf(a.day) - weekdays.indexOf(b.day)
-    );
+    if (expensesList.some((item) => item.day === selectedDay)) {
+      const updatedList = expensesList.map((item) =>
+        item.day === selectedDay
+          ? { day: item.day, expense: newExpense.expense + item.expense }
+          : item
+      );
+      setExpensesList(updatedList);
+      setCurrentAmount((prev) => prev - expense);
+      setDailyExpense("0");
+      setResult("0");
+    } else {
+      const updatedList = [...expensesList, newExpense];
 
-    setExpensesList(updatedList);
-    setCurrentAmount((prev) => prev - expense);
-    setDailyExpense("0");
+      updatedList.sort(
+        (a, b) => weekdays.indexOf(a.day) - weekdays.indexOf(b.day)
+      );
+
+      setExpensesList(updatedList);
+      setCurrentAmount((prev) => prev - expense);
+      setDailyExpense("0");
+      setResult("0");
+    }
   };
 
   const handleDelete = (index: number) => {
