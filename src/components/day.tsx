@@ -1,4 +1,5 @@
 // import React from 'react';
+import SignIn from "@/components/signIn";
 
 const Day = () => {
   const today = new Date();
@@ -20,7 +21,10 @@ const Day = () => {
   };
   const weekOfYear = getWeekOfYear(today);
 
+
   return (
+    <>
+     <SignIn  />
     <div className="flex items-center p-4">
       <div className="text-left w-1/2 ">
         <div className="text-lg font-semibold text-gray-700">Heute</div>
@@ -29,8 +33,10 @@ const Day = () => {
       <div className="text-right w-1/2">
         <div className="text-sm text-gray-400">Woche {weekOfYear} </div>
         <div className="text-3xl font-bold text-blue-600">{dayOfWeek}</div>
-      </div>
+      </div> 
     </div>
+     
+    </>
   );
 };
 
