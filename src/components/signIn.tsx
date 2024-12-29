@@ -1,7 +1,8 @@
 import GoogleButton from "react-google-button";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { UserAuth } from "../context/AuthContext";
 import { User } from "firebase/auth";
+import logout from "../assets/logout.png";
 
 export function Greeting({
   name,
@@ -25,17 +26,30 @@ export function Greeting({
     timeOfDay = "Gute Nacht";
   }
   return (
-    <div className="w-auto text-center flex justify-center items-center">
-      <h2 className="px-6">
+    <div className="px-2 w-auto flex justify-between items-center border-b border-gray-800 border-dashed">
+      <h2 className="text-sm font-light">
         {timeOfDay}, {name}!
       </h2>
-      <div className="flex gap-4">
-        <Button
-          className="w-20 h-8 p-2 m-4"
+      <div className="">
+        <img
+          title="Abmelden"
+          src={logout}
+          alt="logout"
+          className="w-8 h-8 p-2 cursor-pointer transition-transform duration-500 hover:-translate-y-1"
+          onClick={() => handleSignOut()}
+        />
+        {/* <Button
+          className="w-6 h-6 bg-white border-none rounded-full p-1"
           onClick={() => handleSignOut()}
         >
-          Logout
+          <img
+          src={logout}
+          alt="logout"
+          className="w-4 h-4"
+         
+        /> 
         </Button>
+        */}
       </div>
     </div>
   );
