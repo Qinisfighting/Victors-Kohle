@@ -1,5 +1,4 @@
 // import React from 'react';
-import SignIn from "@/components/signIn";
 
 const Day = () => {
   const today = new Date();
@@ -24,7 +23,6 @@ const Day = () => {
 
   return (
     <>
-     <SignIn  />
     <div className="flex items-center p-4">
       <div className="text-left w-1/2 ">
         <div className="text-lg font-semibold text-gray-700">Heute</div>

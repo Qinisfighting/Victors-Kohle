@@ -73,11 +73,11 @@ const SignIn = () => {
 
   return user === null ? (
     <div className="w-auto  flex flex-col justify-center items-center h-view">
-      <GoogleButton onClick={() => handleGoogleSignIn()} />
-      <p className="px-8 py-10">
+      <GoogleButton  label='Mit Google anmelden' onClick={() => handleGoogleSignIn()} />
+      <p className="px-8 py-4">
         Kein Google-Konto? Registriere dich{" "}
         <a
-          className="text-myblue-400 underline"
+          className="underline"
           href="https://support.google.com/mail/answer/56256?hl=en"
           target="_blank"
           rel="noreferrer"

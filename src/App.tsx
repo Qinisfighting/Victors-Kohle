@@ -4,13 +4,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Day from "./components/day";
 import PocketMoney from "@/components/pocketMoney";
 import Savings from "@/components/savings";
-
+import SignIn from "@/components/signIn";
+import { UserAuth } from "./context/AuthContext";
+import { User } from "firebase/auth";
 
 function App() {
+  const { user }: { user: User | null } = UserAuth() as { user: User | null };
   return (
-    <>
-      <div>
-        <Day />
+    <>   
+        <SignIn  />
+       { user &&
+        <div>
+          <Day />
         <Tabs
           defaultValue="pocketMoney"
           className="max-w-md bg-transparent border-none"
@@ -30,7 +35,8 @@ function App() {
             <Savings />
           </TabsContent>
         </Tabs>
-      </div>
+        </div>
+        } 
     </>
   );
 }
