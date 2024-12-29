@@ -8,7 +8,7 @@ When my son started receiving weekly pocket money, I saw the perfect opportunity
 
 - Lightweight and simple to use.
 
-- Visually appealing for kids.
+- Visually appealing for cool kids.
 
 - Fun and engaging, making learning enjoyable.
 
