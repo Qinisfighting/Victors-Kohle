@@ -35,7 +35,7 @@ export function Greeting({
           title="Abmelden"
           src={logout}
           alt="logout"
-          className="w-8 h-8 p-2 cursor-pointer transition-transform duration-500 hover:-translate-y-1"
+          className="w-8 h-8 p-1 cursor-pointer"
           onClick={() => handleSignOut()}
         />
         {/* <Button
