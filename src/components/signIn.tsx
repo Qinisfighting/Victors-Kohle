@@ -27,7 +27,7 @@ export function Greeting({
   }
   return (
     <div className="px-2 w-auto flex justify-between items-center border-b border-gray-800 border-dashed">
-      <h2 className="text-md font-cabin">
+      <h2 className="text-md font-fredericka">
         {timeOfDay}, {name} !
       </h2>
       <div className="">

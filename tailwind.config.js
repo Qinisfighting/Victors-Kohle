@@ -66,6 +66,7 @@ module.exports = {
 			cabin: ['Cabin Sketch', 'serif'], 
 			expletus: ['Expletus Sans', 'serif'],
 			indie: ['Indie Flower', 'serif'],
+			fredericka: ['Fredericka the Great', 'serif'],
 		  },
   	}
   },
