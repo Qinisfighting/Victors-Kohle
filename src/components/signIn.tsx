@@ -26,8 +26,8 @@ export function Greeting({
     timeOfDay = "Gute Nacht";
   }
   return (
-    <div className="px-2 w-auto flex justify-between items-center ">
-      <h2 className="text-md font-just text-cyan-800">
+    <div className="w-auto px-1 flex justify-between items-center ">
+      <h2 className="text-md font-just text-gray-700">
         {timeOfDay}, {name} !
       </h2>
       <div className="">
@@ -35,7 +35,7 @@ export function Greeting({
           title="Abmelden"
           src={logout}
           alt="logout"
-          className="w-8 h-8 p-2 cursor-pointer hover:animate-shake"
+          className="w-4 h-4 cursor-pointer hover:animate-shake"
           onClick={() => handleSignOut()}
         />
         {/* <Button
