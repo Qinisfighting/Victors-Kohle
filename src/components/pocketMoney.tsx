@@ -93,7 +93,7 @@ const PocketMoney = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
       <div className="flex items-center space-x-4 mb-4">
         <label className="font-medium mb-2 w-1/2 text-left">
           Einkommen (€):
