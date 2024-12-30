@@ -27,8 +27,8 @@ export function Greeting({
   }
   return (
     <div className="px-2 w-auto flex justify-between items-center border-b border-gray-800 border-dashed">
-      <h2 className="text-sm">
-        {timeOfDay}, {name}!
+      <h2 className="text-md font-indie">
+        {timeOfDay}, {name} !
       </h2>
       <div className="">
         <img
@@ -88,17 +88,17 @@ const SignIn = () => {
   return user === null ? (
     <div className="w-auto  flex flex-col justify-center items-center h-view">
       <GoogleButton label='Mit Google anmelden' type="light"  onClick={() => handleGoogleSignIn()} />
-      <p className="px-8 py-4">
+      <p className="px-8 py-4 text-sm">
         Kein Google-Konto? Registriere dich{" "}
         <a
-          className="underline text-gray-900 hover:text-gray-500"
+          className="text-gray-700 text-lg hover:text-red-500"
           href="https://support.google.com/mail/answer/56256?hl=en"
           target="_blank"
           rel="noreferrer"
         >
-          hier
+          ⇝
         </a>
-        .
+        ...
       </p>
     </div>
   ) : (

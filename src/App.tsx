@@ -14,7 +14,7 @@ function App() {
   return (
     <>   
         <div className="text-center">
-          <img src={logo} alt="logo" className="inline-block w-32 h-32 my-4 mx-auto" />
+          <img src={logo} alt="logo" className="inline-block w-32 h-32 mb-4 mx-auto" />
         <SignIn  />
        { user &&
         <div>

@@ -61,7 +61,12 @@ module.exports = {
 		  },
 		  animation: {
 			shake: 'shake 0.5s ease-in-out',
-		  }
+		  },
+		  fontFamily: {
+			cabin: ['Cabin Sketch', 'serif'], 
+			expletus: ['Expletus Sans', 'serif'],
+			indie: ['Indie Flower', 'serif'],
+		  },
   	}
   },
   plugins: [require("tailwindcss-animate")],
