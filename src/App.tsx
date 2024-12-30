@@ -13,7 +13,7 @@ function App() {
   const { user }: { user: User | null } = UserAuth() as { user: User | null };
   return (
     <>   
-        <div className="text-center border-b border-gray-800 border-opacity-50">
+        <div className="text-center border-b border-dashed border-gray-800 border-opacity-50">
           <img src={logo} alt="logo" className="inline-block w-32 h-32 mb-4 mx-auto " />
         </div>
         <SignIn  />

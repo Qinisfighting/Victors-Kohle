@@ -91,7 +91,7 @@ const SignIn = () => {
       <p className="px-8 py-4 text-sm">
         Kein Google-Konto? Registriere dich{" "}
         <a
-          className="text-black text-3xl hover:text-red-500"
+          className="text-gray-700 text-4xl hover:text-red-500"
           href="https://support.google.com/mail/answer/56256?hl=en"
           target="_blank"
           rel="noreferrer"
