@@ -23,13 +23,13 @@ const Day = () => {
 
   return (
     <>
-    <div className="flex items-center p-4">
+    <div className="flex items-center p-4 mt-4">
       <div className="text-left w-1/2 ">
         <div className="text-lg font-semibold text-gray-700">Heute</div>
         <div className="text-md text-gray-500">{formattedDate}</div>
       </div>
       <div className="text-right w-1/2">
-        <div className="text-sm text-gray-400">Woche {weekOfYear} </div>
+        <div className="text-sm text-gray-500">Woche {weekOfYear} </div>
         <div className="text-3xl font-bold text-blue-600">{dayOfWeek}</div>
       </div> 
     </div>
