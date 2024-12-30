@@ -63,10 +63,7 @@ module.exports = {
 			shake: 'shake 0.5s ease-in-out',
 		  },
 		  fontFamily: {
-			cabin: ['Cabin Sketch', 'serif'], 
-			expletus: ['Expletus Sans', 'serif'],
-			indie: ['Indie Flower', 'serif'],
-			fredericka: ['Fredericka the Great', 'serif'],
+			just: ['Just Me Again Down Here', 'serif']
 		  },
   	}
   },
