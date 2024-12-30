@@ -35,7 +35,7 @@ export function Greeting({
           title="Abmelden"
           src={logout}
           alt="logout"
-          className="w-8 h-8 p-1 cursor-pointer hover:animate-shake"
+          className="w-8 h-8 p-2 cursor-pointer hover:animate-shake"
           onClick={() => handleSignOut()}
         />
         {/* <Button
@@ -88,10 +88,10 @@ const SignIn = () => {
   return user === null ? (
     <div className="w-auto  flex flex-col justify-center items-center h-view mt-8">
       <GoogleButton label='Mit Google anmelden' type="light"  onClick={() => handleGoogleSignIn()} />
-      <p className="px-8 py-2 text-md">
+      <p className="px-8 py-4 text-sm">
         Kein Google-Konto? Registriere dich{" "}
         <a
-          className="text-blue-700 text-xl hover:text-red-500"
+          className="text-black text-3xl hover:text-red-500"
           href="https://support.google.com/mail/answer/56256?hl=en"
           target="_blank"
           rel="noreferrer"
