@@ -7,11 +7,14 @@ import Savings from "@/components/savings";
 import SignIn from "@/components/signIn";
 import { UserAuth } from "./context/AuthContext";
 import { User } from "firebase/auth";
+import logo from "./assets/logo.png";
 
 function App() {
   const { user }: { user: User | null } = UserAuth() as { user: User | null };
   return (
     <>   
+        <div className="text-center">
+          <img src={logo} alt="logo" className="inline-block w-32 h-32 my-4 mx-auto" />
         <SignIn  />
        { user &&
         <div>
@@ -37,6 +40,7 @@ function App() {
         </Tabs>
         </div>
         } 
+        </div>
     </>
   );
 }
