@@ -28,6 +28,16 @@ const PocketMoney = () => {
     setSelectedDay(today);
   }, []);
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isResultCorrect) {
+      timer = setTimeout(() => {
+        setIsResultCorrect(false);
+      }, 7000);
+    }
+    return () => clearTimeout(timer);
+  }, [isResultCorrect]);
+
   const handleCalculate = () => {
     const expense = parseFloat(dailyExpense);
     const resultNumber = parseFloat(result);
