@@ -17,7 +17,7 @@ const PocketMoney = () => {
   const [dailyExpense, setDailyExpense] = useState<string>("0");
   const [result, setResult] = useState<string>("0");
   const [isResultCorrect, setIsResultCorrect] = useState<boolean>(false);
-  const [startingAmount, setStartingAmount] = useState(15);
+  const [startingAmount, setStartingAmount] = useState<string>("15");
   const [currentAmount, setCurrentAmount] = useState(15);
   const [expensesList, setExpensesList] = useState<
     { day: string; expense: number }[]
@@ -118,9 +118,10 @@ const PocketMoney = () => {
         <Input
           type="number"
           value={startingAmount}
+          onClick={() => setStartingAmount("")}
           onChange={(e) => {
             const newAmount = parseFloat(e.target.value);
-            setStartingAmount(newAmount);
+            setStartingAmount(newAmount.toString());
             setCurrentAmount(
               newAmount -
                 expensesList.reduce((acc, item) => acc + item.expense, 0)
