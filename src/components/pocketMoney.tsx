@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import Confetti from "react-confetti";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -15,6 +16,7 @@ const PocketMoney = () => {
   const [selectedDay, setSelectedDay] = useState("");
   const [dailyExpense, setDailyExpense] = useState<string>("0");
   const [result, setResult] = useState<string>("0");
+  const [isResultCorrect, setIsResultCorrect] = useState<boolean>(false);
   const [startingAmount, setStartingAmount] = useState(15);
   const [currentAmount, setCurrentAmount] = useState(15);
   const [expensesList, setExpensesList] = useState<
@@ -57,6 +59,7 @@ const PocketMoney = () => {
       setCurrentAmount((prev) => prev - expense);
       setDailyExpense("0");
       setResult("0");
+      setIsResultCorrect(true);
     } else {
       const updatedList = [...expensesList, newExpense];
 
@@ -68,6 +71,7 @@ const PocketMoney = () => {
       setCurrentAmount((prev) => prev - expense);
       setDailyExpense("0");
       setResult("0");
+      setIsResultCorrect(true);
     }
   };
 
@@ -94,6 +98,9 @@ const PocketMoney = () => {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+      <div className="confetti">
+        {isResultCorrect && <Confetti recycle={false} />}
+      </div>
       <div className="flex items-center space-x-4 mb-4">
         <label className="font-medium mb-2 w-1/2 text-left">
           Einkommen (€):
