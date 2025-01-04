@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Confetti from "react-confetti";
 
 const PocketMoney = () => {
@@ -22,6 +23,8 @@ const PocketMoney = () => {
   const [expensesList, setExpensesList] = useState<
     { day: string; expense: number }[]
   >([]);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertType, setAlertType] = useState<"success" | "error" | null>(null);
 
   useEffect(() => {
     const today = new Date().toLocaleDateString("de-DE", { weekday: "long" });
@@ -48,14 +51,19 @@ const PocketMoney = () => {
       isNaN(resultNumber) ||
       resultNumber < 0
     ) {
-      alert("Gib bitte eine gültige Zahl ein.");
+      setAlertMessage("Gib bitte eine gültige Zahl ein.");
+      setAlertType("error");
       return;
     }
 
     if (currentAmount - expense !== parseFloat(result)) {
-      alert("Ups, die Berechnung ist falsch, versuch es nochmal!");
+      setAlertMessage("Ups, die Berechnung ist falsch, versuch es nochmal!");
+      setAlertType("error");
       return;
     }
+
+    setAlertMessage("Berechnung korrekt! Gute Arbeit!");
+    setAlertType("success");
 
     const newExpense = { day: selectedDay, expense };
 
@@ -108,6 +116,17 @@ const PocketMoney = () => {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+      {alertMessage && alertType && (
+        <Alert
+          className="mb-6 py-2"
+          variant={alertType === "error" ? "destructive" : "default"}
+        >
+          <AlertTitle>
+            {alertType === "error" ? "Fehler 👾" : "Erfolg 🎉"}
+          </AlertTitle>
+          <AlertDescription>{alertMessage}</AlertDescription>
+        </Alert>
+      )}
       <div className="confetti">
         {isResultCorrect && <Confetti recycle={false} />}
       </div>
