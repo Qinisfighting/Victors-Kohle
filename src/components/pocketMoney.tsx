@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
+import monster from "@/assets/monster.png";
+import balloon from "@/assets/balloon.png";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -23,6 +26,7 @@ const PocketMoney = () => {
   const [expensesList, setExpensesList] = useState<
     { day: string; expense: number }[]
   >([]);
+  const { width, height } = useWindowSize();
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<"success" | "error" | null>(null);
 
@@ -41,6 +45,42 @@ const PocketMoney = () => {
     return () => clearTimeout(timer);
   }, [isResultCorrect]);
 
+  const getRandomErrAlert = () => {
+    const messages = [
+      "Ups, das war leider nicht ganz richtig. Versuch es doch nochmal!",
+      "Deine Berechnung stimmt nicht ganz. Denk nochmal nach und probier es erneut!",
+      "Fast richtig, aber noch nicht ganz. Gib dir einen Moment und versuch’s nochmal!",
+      "Das Ergebnis passt noch nicht. Probier es einfach nochmal in Ruhe!",
+      "Huch, da hat sich ein kleiner Fehler eingeschlichen. Versuch es doch nochmal!",
+      "Nicht schlimm, das war ein guter Versuch! Versuch es einfach noch einmal!",
+      "Deine Berechnung ist leider nicht korrekt. Versuch es nochmal, du kannst das!",
+      "Das Ergebnis ist noch nicht richtig. Versuch’s nochmal, ich glaube an dich!",
+      "Schade, das war knapp daneben. Versuch es nochmal, du schaffst das!",
+      "Deine Antwort ist leider falsch. Aber kein Problem, probier es einfach noch einmal!",
+    ];
+
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    return messages[randomIndex];
+  };
+
+  const getRandomPraise = () => {
+    const messages = [
+      "Super gemacht, das war genau richtig!",
+      "Klasse, du hast die Aufgabe perfekt gelöst!",
+      "Richtig gerechnet, das war spitze!",
+      "Toll, du hast das wunderbar gelöst!",
+      "Fantastisch, deine Antwort ist absolut korrekt!",
+      "Bravo, du bist ein Mathe-Champion!",
+      "Ausgezeichnet! Deine Berechnung stimmt!",
+      "Wow, das war richtig gut! Weiter so!",
+      "Du hast das großartig gemacht, alles richtig!",
+      "Herzlichen Glückwunsch, das Ergebnis ist perfekt!",
+    ];
+
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    return messages[randomIndex];
+  };
+
   const handleCalculate = () => {
     const expense = parseFloat(dailyExpense);
     const resultNumber = parseFloat(result);
@@ -57,12 +97,12 @@ const PocketMoney = () => {
     }
 
     if (currentAmount - expense !== parseFloat(result)) {
-      setAlertMessage("Ups, die Berechnung ist falsch, versuch es nochmal!");
+      setAlertMessage(getRandomErrAlert());
       setAlertType("error");
       return;
     }
 
-    setAlertMessage("Berechnung korrekt! Gute Arbeit!");
+    setAlertMessage(getRandomPraise());
     setAlertType("success");
 
     const newExpense = { day: selectedDay, expense };
@@ -122,13 +162,24 @@ const PocketMoney = () => {
           variant={alertType === "error" ? "destructive" : "default"}
         >
           <AlertTitle>
-            {alertType === "error" ? "Fehler 👾" : "Erfolg 🎉"}
+            {alertType === "error" ? (
+              <img src={monster} className="mx-auto w-8" />
+            ) : (
+              <img src={balloon} className="mx-auto w-12" />
+            )}
           </AlertTitle>
           <AlertDescription>{alertMessage}</AlertDescription>
         </Alert>
       )}
       <div className="confetti">
-        {isResultCorrect && <Confetti recycle={false} />}
+        {isResultCorrect && (
+          <Confetti
+            recycle={false}
+            numberOfPieces={770}
+            width={width}
+            height={height}
+          />
+        )}
       </div>
       <div className="flex items-center space-x-4 mb-4">
         <label className="font-medium mb-2 w-1/2 text-left">
