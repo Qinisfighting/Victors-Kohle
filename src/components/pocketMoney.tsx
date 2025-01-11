@@ -5,6 +5,8 @@ import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import monster from "@/assets/monster.png";
 import balloon from "@/assets/balloon.png";
+import { Timestamp } from "firebase/firestore";
+import { TGFormData } from "../../types";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -23,9 +25,9 @@ const PocketMoney = () => {
   const [isResultCorrect, setIsResultCorrect] = useState<boolean>(false);
   const [startingAmount, setStartingAmount] = useState<string>("15");
   const [currentAmount, setCurrentAmount] = useState(15);
-  const [expensesList, setExpensesList] = useState<
-    { day: string; expense: number }[]
-  >([]);
+  const [expensesList, setExpensesList] = useState<TGFormData[]>([
+    { day: "", expense: null, createdOn: Timestamp.now() },
+  ]);
   const { width, height } = useWindowSize();
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<"success" | "error" | null>(null);
@@ -105,12 +107,20 @@ const PocketMoney = () => {
     setAlertMessage(getRandomPraise());
     setAlertType("success");
 
-    const newExpense = { day: selectedDay, expense };
+    const newExpense = {
+      day: selectedDay,
+      expense,
+      createdOn: Timestamp.now(),
+    };
 
     if (expensesList.some((item) => item.day === selectedDay)) {
       const updatedList = expensesList.map((item) =>
         item.day === selectedDay
-          ? { day: item.day, expense: newExpense.expense + item.expense }
+          ? {
+              day: item.day,
+              expense: newExpense.expense + (item.expense ?? 0),
+              createdOn: item.createdOn,
+            }
           : item
       );
       setExpensesList(updatedList);
@@ -138,7 +148,9 @@ const PocketMoney = () => {
 
     const updatedList = expensesList.filter((_, i) => i !== index);
     setExpensesList(updatedList);
-    setCurrentAmount((prev) => prev + expenseToDelete);
+    if (expenseToDelete !== null) {
+      setCurrentAmount((prev) => prev + expenseToDelete);
+    }
   };
 
   const formatToGerman = (value: number | bigint) => {
@@ -194,7 +206,7 @@ const PocketMoney = () => {
             setStartingAmount(newAmount.toString());
             setCurrentAmount(
               newAmount -
-                expensesList.reduce((acc, item) => acc + item.expense, 0)
+                expensesList.reduce((acc, item) => acc + (item.expense ?? 0), 0)
             );
           }}
           className="w-1/2 p-2 border border-gray-300 rounded-lg bg-white"
@@ -202,25 +214,29 @@ const PocketMoney = () => {
       </div>
       {/* Expense List */}
       <ul className="mb-4">
-        {expensesList.map((item, index) => (
-          <li
-            key={index}
-            className="w-auto flex justify-between items-center bg-gray-100 px-2 rounded-lg mb-1"
-          >
-            <div className="flex justify-between items-center w-5/6">
-              <span className="">{item.day}(€): </span>
-              <span className="">
-                - {formatToGerman(parseFloat(item.expense.toFixed(2)))}
-              </span>
-            </div>
-            <button
-              onClick={() => handleDelete(index)}
-              className="bg-transparent border-none p-1"
-            >
-              🗑️
-            </button>
-          </li>
-        ))}
+        {expensesList.map(
+          (item, index) =>
+            item.expense !== null && (
+              <li
+                key={index}
+                className="w-auto flex justify-between items-center bg-gray-100 px-2 rounded-lg mb-1"
+              >
+                <div className="flex justify-between items-center w-5/6">
+                  <span className="">{item.day}(€): </span>
+                  <span className="">
+                    -{" "}
+                    {formatToGerman(parseFloat((item.expense ?? 0).toFixed(2)))}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleDelete(index)}
+                  className="bg-transparent border-none p-1"
+                >
+                  🗑️
+                </button>
+              </li>
+            )
+        )}
       </ul>
 
       {/* Current Amount */}
