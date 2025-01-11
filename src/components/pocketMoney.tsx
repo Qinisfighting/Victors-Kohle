@@ -163,9 +163,9 @@ const PocketMoney = () => {
         >
           <AlertTitle>
             {alertType === "error" ? (
-              <img src={monster} className="mx-auto w-8" />
+              <img src={monster} className="mx-auto w-10" />
             ) : (
-              <img src={balloon} className="mx-auto w-12" />
+              <img src={balloon} className="mx-auto w-10" />
             )}
           </AlertTitle>
           <AlertDescription>{alertMessage}</AlertDescription>
