@@ -5,11 +5,13 @@ import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import monster from "@/assets/monster.png";
 import balloon from "@/assets/balloon.png";
+import coinincrease from "@/assets/coinincrease.png";
 import { Timestamp } from "firebase/firestore";
 import { TGFormData } from "../../types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { Button } from "./ui/button.tsx";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -265,9 +267,7 @@ const PocketMoney = () => {
         )}
       </div>
       <div className="flex items-center space-x-4 mb-4">
-        <label className="font-medium mb-2 w-1/2 text-left">
-          Einkommen (€):
-        </label>
+        <label className="font-medium mb-2 w-1/2 text-left">Einkommen(€)</label>
         <Input
           type="number"
           value={startingAmount}
@@ -286,7 +286,7 @@ const PocketMoney = () => {
                 className="w-auto flex justify-between items-center bg-gray-100 px-2 rounded-lg mb-1"
               >
                 <div className="flex justify-between items-center w-5/6">
-                  <span className="">{item.day}(€): </span>
+                  <span className="">{item.day} </span>
                   <span className="">
                     -{" "}
                     {formatToGerman(parseFloat((item.expense ?? 0).toFixed(2)))}
@@ -304,11 +304,20 @@ const PocketMoney = () => {
       </ul>
 
       {/* Current Amount */}
-      <div className="flex items-center space-x-4 mb-4">
-        <span className="font-medium mb-2 w-1/2 text-left">
-          Kontonstand (€):
+      <div className="flex items-center  space-x-4 mb-4">
+        <span className="font-medium mb-2 w-1/3 text-left">Kontonstand(€)</span>
+        <span className="w-1/3 text-right font-semibold">
+          {showCurrentAmount()}
         </span>
-        <span className="w-1/2 text-left">{showCurrentAmount()}</span>
+        <span className="w-1/3 text-right">
+          <Button className="w-6 h-6 bg-transparent border-gray-300 p-0 hover:bg-blue-200  hover:border-none">
+            <img
+              src={coinincrease}
+              className="w-6 m-auto p-1"
+              title="Steck das Geld ins Sparschwein！"
+            />
+          </Button>
+        </span>
       </div>
       {/* Dropdown and Daily Expense */}
       <div className="flex items-center space-x-4 mb-4">
@@ -333,9 +342,7 @@ const PocketMoney = () => {
         />
       </div>
       <div className="flex items-center space-x-4 mb-4">
-        <label className="font-medium mb-2 w-1/2 text-left">
-          Ergebnis (€):
-        </label>
+        <label className="font-medium mb-2 w-1/2 text-left">Ergebnis(€)</label>
         <Input
           type="number"
           placeholder="Wie viel bleibt?"
