@@ -7,6 +7,8 @@ import monster from "@/assets/monster.png";
 import balloon from "@/assets/balloon.png";
 import { Timestamp } from "firebase/firestore";
 import { TGFormData } from "../../types";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebase.ts";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -32,6 +34,9 @@ const PocketMoney = () => {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<"success" | "error" | null>(null);
 
+  const collectionName = "amount";
+  const documentId = "weeklyStartingAmountDoc";
+
   useEffect(() => {
     const today = new Date().toLocaleDateString("de-DE", { weekday: "long" });
     setSelectedDay(today);
@@ -46,6 +51,48 @@ const PocketMoney = () => {
     }
     return () => clearTimeout(timer);
   }, [isResultCorrect]);
+
+  // Fetch `startingAmount` from Firebase on component mount
+  useEffect(() => {
+    const fetchStartingAmount = async () => {
+      try {
+        const docRef = doc(db, collectionName, documentId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setStartingAmount(data.startingAmount);
+        } else {
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching starting amount:", error);
+      }
+    };
+
+    fetchStartingAmount();
+  }, []);
+
+  // Save `startingAmount` to Firebase whenever it changes
+  const handleStartingAmountChange = async (e: {
+    target: { value: string };
+  }) => {
+    const newAmount = parseFloat(e.target.value);
+    setStartingAmount(newAmount.toString());
+
+    // Update currentAmount dynamically
+    const updatedAmount =
+      newAmount -
+      expensesList.reduce((acc, item) => acc + (item.expense ?? 0), 0);
+    setCurrentAmount(updatedAmount);
+
+    try {
+      const docRef = doc(db, collectionName, documentId);
+      await setDoc(docRef, { startingAmount: newAmount.toString() });
+      console.log("Starting amount updated successfully in Firebase!");
+    } catch (error) {
+      console.error("Error updating starting amount:", error);
+    }
+  };
 
   const getRandomErrAlert = () => {
     const messages = [
@@ -201,14 +248,7 @@ const PocketMoney = () => {
           type="number"
           value={startingAmount}
           onClick={() => setStartingAmount("")}
-          onChange={(e) => {
-            const newAmount = parseFloat(e.target.value);
-            setStartingAmount(newAmount.toString());
-            setCurrentAmount(
-              newAmount -
-                expensesList.reduce((acc, item) => acc + (item.expense ?? 0), 0)
-            );
-          }}
+          onChange={handleStartingAmountChange}
           className="w-1/2 p-2 border border-gray-300 rounded-lg bg-white"
         />
       </div>
