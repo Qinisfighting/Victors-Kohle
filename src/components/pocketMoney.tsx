@@ -310,10 +310,10 @@ const PocketMoney = () => {
           {showCurrentAmount()}
         </span>
         <span className="w-1/3 text-right">
-          <Button className="w-6 h-6 bg-transparent border-gray-300 p-0 hover:bg-blue-200  hover:border-none">
+          <Button className="w-8 h-8 bg-transparent border-gray-800 p-0 hover:bg-blue-200  hover:border-none">
             <img
               src={coinincrease}
-              className="w-6 m-auto p-1"
+              className="w-6 m-auto p-0"
               title="Steck das Geld ins Sparschwein！"
             />
           </Button>
