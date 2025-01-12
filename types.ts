@@ -5,3 +5,9 @@ export interface TGFormData {
   expense: number | null;
   createdOn: Timestamp;
 }
+
+export interface Expense {
+  day: string;
+  expense: number | null;
+  createdOn: Timestamp;
+}

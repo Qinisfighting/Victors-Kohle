@@ -9,6 +9,7 @@ import { Timestamp } from "firebase/firestore";
 import { TGFormData } from "../../types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase.ts";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -20,7 +21,9 @@ const PocketMoney = () => {
     "Samstag",
     "Sonntag",
   ];
-
+  const auth = getAuth();
+  const [, setUser] = useState<User | null>(null);
+  const [uid, setUid] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState("");
   const [dailyExpense, setDailyExpense] = useState<string>("0");
   const [result, setResult] = useState<string>("0");
@@ -38,6 +41,22 @@ const PocketMoney = () => {
   const documentId = "weeklyStartingAmountDoc";
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        if (currentUser) {
+          setUid(currentUser.uid); // Save the UID for Firestore operations
+        }
+      } else {
+        setUser(null);
+        setUid(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
+
+  useEffect(() => {
     const today = new Date().toLocaleDateString("de-DE", { weekday: "long" });
     setSelectedDay(today);
   }, []);
@@ -52,30 +71,33 @@ const PocketMoney = () => {
     return () => clearTimeout(timer);
   }, [isResultCorrect]);
 
-  // Fetch `startingAmount` from Firebase on component mount
+  // Fetch `startingAmount` from Firestore
   useEffect(() => {
-    const fetchStartingAmount = async () => {
-      try {
-        const docRef = doc(db, collectionName, documentId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setStartingAmount(data.startingAmount);
-        } else {
-          console.log("No such document!");
+    if (uid) {
+      const fetchStartingAmount = async () => {
+        try {
+          const docRef = doc(db, "users", uid, collectionName, documentId);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data() as { startingAmount: string };
+            setStartingAmount(data.startingAmount);
+            setCurrentAmount(parseFloat(data.startingAmount));
+          } else {
+            console.log("No such document for user!");
+          }
+        } catch (error) {
+          console.error("Error fetching starting amount:", error);
         }
-      } catch (error) {
-        console.error("Error fetching starting amount:", error);
-      }
-    };
+      };
 
-    fetchStartingAmount();
-  }, []);
+      fetchStartingAmount();
+    }
+  }, [uid]);
 
-  // Save `startingAmount` to Firebase whenever it changes
-  const handleStartingAmountChange = async (e: {
-    target: { value: string };
-  }) => {
+  // Save `startingAmount` to Firestore
+  const handleStartingAmountChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const newAmount = parseFloat(e.target.value);
     setStartingAmount(newAmount.toString());
 
@@ -85,12 +107,14 @@ const PocketMoney = () => {
       expensesList.reduce((acc, item) => acc + (item.expense ?? 0), 0);
     setCurrentAmount(updatedAmount);
 
-    try {
-      const docRef = doc(db, collectionName, documentId);
-      await setDoc(docRef, { startingAmount: newAmount.toString() });
-      console.log("Starting amount updated successfully in Firebase!");
-    } catch (error) {
-      console.error("Error updating starting amount:", error);
+    if (uid) {
+      try {
+        const docRef = doc(db, "users", uid, collectionName, documentId);
+        await setDoc(docRef, { startingAmount: newAmount.toString() });
+        console.log("Starting amount updated successfully in Firestore!");
+      } catch (error) {
+        console.error("Error updating starting amount:", error);
+      }
     }
   };
 
