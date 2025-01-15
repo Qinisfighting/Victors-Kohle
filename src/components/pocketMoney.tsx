@@ -312,7 +312,7 @@ const PocketMoney = () => {
           <button className="w-8 h-8 bg-transparent border-none p-0 hover:animate-shakeUp hover:border-none">
             <img
               src={coinincrease}
-              className="w-8 h-8 bg-transparent border-none p-0 hover:animate-shakeUp hover:border-none"
+              className="w-6 m-auto p-0"
               title="Steck das Geld ins Sparschwein！"
             />
           </button>
