@@ -58,9 +58,16 @@ module.exports = {
           "50%": { transform: "translateX(5px)" },
           "75%": { transform: "translateX(-5px)" },
         },
+        shakeUp: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "25%": { transform: "translateY(-5px)" },
+          "50%": { transform: "translateY(5px)" },
+          "75%": { transform: "translateY(-5px)" },
+        },
       },
       animation: {
         shake: "shake 0.5s ease-in-out",
+        shakeUp: "shakeUp 0.5s ease-in-out",
       },
       fontFamily: {
         just: ["Just Me Again Down Here", "serif"],

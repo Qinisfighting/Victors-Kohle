@@ -11,7 +11,6 @@ import { TGFormData } from "../../types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { Button } from "./ui/button.tsx";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -310,13 +309,13 @@ const PocketMoney = () => {
           {showCurrentAmount()}
         </span>
         <span className="w-1/3 text-right">
-          <Button className="w-8 h-8 bg-transparent border-gray-800 p-0 hover:bg-blue-200  hover:border-none">
+          <button className="w-8 h-8 bg-transparent border-none p-0 hover:animate-shakeUp">
             <img
               src={coinincrease}
               className="w-6 m-auto p-0"
               title="Steck das Geld ins Sparschwein！"
             />
-          </Button>
+          </button>
         </span>
       </div>
       {/* Dropdown and Daily Expense */}
