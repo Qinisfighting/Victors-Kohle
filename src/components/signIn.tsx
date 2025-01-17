@@ -35,7 +35,7 @@ export function Greeting({
           title="Abmelden"
           src={logout}
           alt="logout"
-          className="w-4 h-4 cursor-pointer hover:animate-shake"
+          className="w-6 h-6 mt-1 cursor-pointer hover:animate-shake"
           onClick={() => handleSignOut()}
         />
         {/* <Button
@@ -77,7 +77,7 @@ const SignIn = () => {
       console.log(error);
     }
   };
- const handleSignOut = async () => {
+  const handleSignOut = async () => {
     try {
       await logOut();
     } catch (error) {
@@ -87,7 +87,11 @@ const SignIn = () => {
 
   return user === null ? (
     <div className="w-auto  flex flex-col justify-center items-center h-view mt-8">
-      <GoogleButton label='Mit Google anmelden' type="light"  onClick={() => handleGoogleSignIn()} />
+      <GoogleButton
+        label="Mit Google anmelden"
+        type="light"
+        onClick={() => handleGoogleSignIn()}
+      />
       <p className="px-8 py-4 text-sm">
         Kein Google-Konto? Registriere dich{" "}
         <a
