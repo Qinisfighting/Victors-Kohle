@@ -72,7 +72,7 @@ const PocketMoney = () => {
     return () => clearTimeout(timer);
   }, [isResultCorrect]);
 
-  // Fetch `startingAmount` from Firestore
+  // Fetch `startingAmount`
   useEffect(() => {
     if (uid) {
       const fetchStartingAmount = async () => {
@@ -95,29 +95,73 @@ const PocketMoney = () => {
     }
   }, [uid]);
 
-  // Save `startingAmount` to Firestore
+  // Save `startingAmount`
   const handleStartingAmountChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const newAmount = parseFloat(e.target.value);
     setStartingAmount(newAmount.toString());
 
-    // Update currentAmount dynamically
-    const updatedAmount =
-      newAmount -
-      expensesList.reduce((acc, item) => acc + (item.expense ?? 0), 0);
-    setCurrentAmount(updatedAmount);
+    // // Update currentAmount dynamically
+    // const updatedAmount =
+    //   newAmount -
+    //   expensesList.reduce((acc, item) => acc + (item.expense ?? 0), 0);
+    // setCurrentAmount(updatedAmount);
 
-    if (uid) {
-      try {
-        const docRef = doc(db, "users", uid, collectionName, documentId);
-        await setDoc(docRef, { startingAmount: newAmount.toString() });
-        console.log("Starting amount updated successfully in Firestore!");
-      } catch (error) {
-        console.error("Error updating starting amount:", error);
-      }
-    }
+    // if (uid) {
+    //   try {
+    //     const docRef = doc(db, "users", uid, collectionName, documentId);
+    //     await setDoc(docRef, { startingAmount: newAmount.toString() });
+    //     console.log("Starting amount updated successfully in Firestore!");
+    //   } catch (error) {
+    //     console.error("Error updating starting amount:", error);
+    //   }
+    // }
   };
+
+  // Fetch `expensesList`
+  useEffect(() => {
+    const fetchExpensesList = async () => {
+      if (uid) {
+        try {
+          const docRef = doc(db, "users", uid, "expensesList", "data");
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data() as { expenses: TGFormData[] };
+            setExpensesList(data.expenses);
+          } else {
+            console.log("No expenses list found in Firestore.");
+          }
+        } catch (error) {
+          console.error("Error fetching expenses list from Firestore:", error);
+        }
+      }
+    };
+
+    fetchExpensesList();
+  }, [uid]);
+
+  // Fetch `currentAmount`
+  useEffect(() => {
+    const fetchCurrentAmount = async () => {
+      if (uid) {
+        try {
+          const docRef = doc(db, "users", uid, "amount", "currentAmountDoc");
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data() as { currentAmount: string };
+            setCurrentAmount(parseFloat(data.currentAmount));
+          } else {
+            console.log("No current amount found in Firestore.");
+          }
+        } catch (error) {
+          console.error("Error fetching current amount from Firestore:", error);
+        }
+      }
+    };
+
+    fetchCurrentAmount();
+  }, [uid]);
 
   const getRandomErrAlert = () => {
     const messages = [
@@ -155,7 +199,7 @@ const PocketMoney = () => {
     return messages[randomIndex];
   };
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const expense = parseFloat(dailyExpense);
     const resultNumber = parseFloat(result);
 
@@ -184,9 +228,9 @@ const PocketMoney = () => {
       expense,
       createdOn: Timestamp.now(),
     };
-
+    let updatedList = [];
     if (expensesList.some((item) => item.day === selectedDay)) {
-      const updatedList = expensesList.map((item) =>
+      updatedList = expensesList.map((item) =>
         item.day === selectedDay
           ? {
               day: item.day,
@@ -201,7 +245,7 @@ const PocketMoney = () => {
       setResult("0");
       setIsResultCorrect(true);
     } else {
-      const updatedList = [...expensesList, newExpense];
+      updatedList = [...expensesList, newExpense];
 
       updatedList.sort(
         (a, b) => weekdays.indexOf(a.day) - weekdays.indexOf(b.day)
@@ -213,15 +257,50 @@ const PocketMoney = () => {
       setResult("0");
       setIsResultCorrect(true);
     }
+    // Save to Firebase
+    if (uid) {
+      try {
+        const docRef = doc(db, "users", uid, "expensesList", "data");
+        await setDoc(docRef, { expenses: updatedList });
+        console.log("Expenses list updated in Firestore!");
+      } catch (error) {
+        console.error("Error saving expenses list to Firestore:", error);
+      }
+      try {
+        const docRef = doc(db, "users", uid, "amount", "currentAmountDoc");
+        await setDoc(docRef, { currentAmount });
+        console.log("Current amount saved to Firestore!");
+      } catch (error) {
+        console.error("Error saving current amount to Firestore:", error);
+      }
+    }
   };
 
-  const handleDelete = (index: number) => {
+  const handleDelete = async (index: number) => {
     const expenseToDelete = expensesList[index].expense;
-
     const updatedList = expensesList.filter((_, i) => i !== index);
+
     setExpensesList(updatedList);
     if (expenseToDelete !== null) {
       setCurrentAmount((prev) => prev + expenseToDelete);
+    }
+
+    // Update Firebase
+    if (uid) {
+      try {
+        const docRef = doc(db, "users", uid, "expensesList", "data");
+        await setDoc(docRef, { expenses: updatedList });
+        console.log("Expenses list updated after deletion.");
+      } catch (error) {
+        console.error("Error updating expenses list in Firestore:", error);
+      }
+      try {
+        const docRef = doc(db, "users", uid, "amount", "currentAmountDoc");
+        await setDoc(docRef, { currentAmount });
+        console.log("Current amount saved to Firestore!");
+      } catch (error) {
+        console.error("Error saving current amount to Firestore:", error);
+      }
     }
   };
 
@@ -237,6 +316,18 @@ const PocketMoney = () => {
       ? "0,00"
       : formatToGerman(parseFloat(currentAmount.toFixed(2)));
   };
+
+  useEffect(() => {
+    const calculateCurrentAmount = () => {
+      const totalExpenses = expensesList.reduce(
+        (acc, item) => acc + (item.expense ?? 0),
+        0
+      );
+      setCurrentAmount(parseFloat(startingAmount) - totalExpenses);
+    };
+
+    calculateCurrentAmount();
+  }, [startingAmount, expensesList]);
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
