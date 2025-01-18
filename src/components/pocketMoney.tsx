@@ -400,7 +400,7 @@ const PocketMoney = () => {
           {showCurrentAmount()}
         </span>
         <span className="w-1/3 text-right">
-          <button className="w-10 h-10 bg-transparent border-none p-0 hover:animate-shakeUp hover:border-none">
+          <button className="w-8 h-8 bg-transparent border-none p-0 hover:animate-shakeUp hover:border-none">
             <img
               src={coinincrease}
               className="m-auto p-0"
