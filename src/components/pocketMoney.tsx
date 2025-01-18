@@ -1,6 +1,18 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import monster from "@/assets/monster.png";
@@ -400,13 +412,32 @@ const PocketMoney = () => {
           {showCurrentAmount()}
         </span>
         <span className="w-1/3 text-right">
-          <button className="w-8 h-8 bg-transparent border-none p-0 hover:animate-shakeUp hover:border-none">
-            <img
-              src={coinincrease}
-              className="m-auto p-0"
-              title="Steck das Geld ins Sparschwein！"
-            />
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="w-8 h-8 bg-transparent border-none p-0 hover:animate-shakeUp hover:border-none">
+                <img
+                  src={coinincrease}
+                  className="m-auto p-0"
+                  title="Sparschwein"
+                />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Willst du das Geld in dein Sparschwein tun?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Deine wöchentliche Ausgabenliste wird gelöscht und der
+                  aktuelle Kontostand auf 0 gesetzt.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Nein</AlertDialogCancel>
+                <AlertDialogAction>Ja</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </span>
       </div>
       {/* Dropdown and Daily Expense */}
