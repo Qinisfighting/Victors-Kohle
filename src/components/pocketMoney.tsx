@@ -12,7 +12,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import monster from "@/assets/monster.png";
