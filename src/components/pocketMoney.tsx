@@ -40,8 +40,8 @@ const PocketMoney = () => {
   const [dailyExpense, setDailyExpense] = useState<string>("0");
   const [result, setResult] = useState<string>("0");
   const [isResultCorrect, setIsResultCorrect] = useState<boolean>(false);
-  const [startingAmount, setStartingAmount] = useState<string>("15");
-  const [currentAmount, setCurrentAmount] = useState(15);
+  const [startingAmount, setStartingAmount] = useState<string>("0");
+  const [currentAmount, setCurrentAmount] = useState(0);
   const [expensesList, setExpensesList] = useState<TGFormData[]>([
     { day: "", expense: null, createdOn: Timestamp.now() },
   ]);
@@ -112,22 +112,15 @@ const PocketMoney = () => {
   ) => {
     const newAmount = parseFloat(e.target.value);
     setStartingAmount(newAmount.toString());
-
-    // // Update currentAmount dynamically
-    // const updatedAmount =
-    //   newAmount -
-    //   expensesList.reduce((acc, item) => acc + (item.expense ?? 0), 0);
-    // setCurrentAmount(updatedAmount);
-
-    // if (uid) {
-    //   try {
-    //     const docRef = doc(db, "users", uid, collectionName, documentId);
-    //     await setDoc(docRef, { startingAmount: newAmount.toString() });
-    //     console.log("Starting amount updated successfully in Firestore!");
-    //   } catch (error) {
-    //     console.error("Error updating starting amount:", error);
-    //   }
-    // }
+    if (uid) {
+      try {
+        const docRef = doc(db, "users", uid, collectionName, documentId);
+        await setDoc(docRef, { startingAmount: newAmount.toString() });
+        console.log("Starting amount updated successfully in Firestore!");
+      } catch (error) {
+        console.error("Error updating starting amount:", error);
+      }
+    }
   };
 
   // Fetch `expensesList`
@@ -340,6 +333,49 @@ const PocketMoney = () => {
     calculateCurrentAmount();
   }, [startingAmount, expensesList]);
 
+  const handlePigClick = () => {
+    setExpensesList([{ day: "", expense: null, createdOn: Timestamp.now() }]);
+    setCurrentAmount(0);
+    setStartingAmount("0");
+    setResult("0");
+    // setAlertMessage("Das Geld ist im Sparschwein gelandet!");
+    // setAlertType("success");
+
+    // Update Firebase
+    if (uid) {
+      const updatedList = [
+        { day: "", expense: null, createdOn: Timestamp.now() },
+      ];
+      try {
+        const docRef = doc(db, "users", uid, "expensesList", "data");
+        setDoc(docRef, { expenses: updatedList });
+        console.log("Expenses list updated after pig click.");
+      } catch (error) {
+        console.error("Error updating expenses list in Firestore:", error);
+      }
+      try {
+        const docRef = doc(
+          db,
+          "users",
+          uid,
+          "amount",
+          "weeklyStartingAmountDoc"
+        );
+        setDoc(docRef, { startingAmount: "0" });
+        console.log("Starting amount saved to Firestore!");
+      } catch (error) {
+        console.error("Error saving starting amount to Firestore:", error);
+      }
+      try {
+        const docRef = doc(db, "users", uid, "amount", "currentAmountDoc");
+        setDoc(docRef, { currentAmount: 0 });
+        console.log("Current amount saved to Firestore!");
+      } catch (error) {
+        console.error("Error saving current amount to Firestore:", error);
+      }
+    }
+  };
+
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
       {alertMessage && alertType && (
@@ -433,7 +469,9 @@ const PocketMoney = () => {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Nein</AlertDialogCancel>
-                <AlertDialogAction>Ja</AlertDialogAction>
+                <AlertDialogAction onClick={handlePigClick}>
+                  Ja
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
