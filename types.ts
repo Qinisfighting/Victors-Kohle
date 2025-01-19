@@ -18,3 +18,5 @@ export interface AccountFlow {
   isPlus: boolean;
   createdOn: Timestamp;
 }
+
+export type UserID = string | null;

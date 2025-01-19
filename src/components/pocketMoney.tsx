@@ -18,7 +18,7 @@ import monster from "@/assets/monster.png";
 import balloon from "@/assets/balloon.png";
 import coinincrease from "@/assets/coinincrease.png";
 import { Timestamp } from "firebase/firestore";
-import { TGFormData } from "../../types";
+import { TGFormData, UserID } from "../../types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { addFlowItem, db } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
@@ -35,7 +35,7 @@ const PocketMoney = () => {
   ];
   const auth = getAuth();
   const [, setUser] = useState<User | null>(null);
-  const [uid, setUid] = useState<string | null>(null);
+  const [uid, setUid] = useState<UserID>(null);
   const [selectedDay, setSelectedDay] = useState("");
   const [dailyExpense, setDailyExpense] = useState<string>("0");
   const [result, setResult] = useState<string>("0");

@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 // import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { Timestamp } from "firebase/firestore";
@@ -25,20 +25,27 @@ export const user = auth.currentUser;
 export const db = getFirestore(app);
 
 export async function addFlowItem(uid: string | null, currentAmount: number) {
+  if (!uid) return;
+
   const newFlowItem = {
     reason: "Tachengeld",
     amount: parseFloat(currentAmount.toFixed(2)),
     isPlus: true,
     createdOn: Timestamp.now(),
   };
-  if (!uid) return;
+
   try {
     const docRef = doc(db, "users", uid, "savingLog", "data");
-
     const docSnap = await getDoc(docRef);
-    const flowItemList = docSnap.exists() ? docSnap.data().flow || [] : [];
 
-    // Check if the item already exists based on timestamp comparison
+    if (!docSnap.exists()) {
+      await setDoc(docRef, { flow: [newFlowItem] });
+      console.log("Saving log initialized with first entry.");
+      return;
+    }
+
+    const flowItemList = docSnap.data().flow || [];
+
     const exists = flowItemList.some(
       (item: AccountFlow) =>
         item.createdOn.toDate().getTime() ===
