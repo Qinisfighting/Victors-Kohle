@@ -2,6 +2,9 @@ import { initializeApp } from "firebase/app";
 // import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
+import { AccountFlow } from "types";
 
 // import { getDatabase } from 'firebase/database';
 
@@ -21,17 +24,56 @@ export const auth = getAuth(app);
 export const user = auth.currentUser;
 export const db = getFirestore(app);
 
-export default app;
-// export const db = getFirestore(app);
-// export const storage = getStorage(app);
-// const articleRef = collection(db, "Articles");
+export async function addFlowItem(uid: string | null, currentAmount: number) {
+  const newFlowItem = {
+    reason: "Tachengeld",
+    amount: parseFloat(currentAmount.toFixed(2)),
+    isPlus: true,
+    createdOn: Timestamp.now(),
+  };
+  if (!uid) return;
+  try {
+    const docRef = doc(db, "users", uid, "savingLog", "data");
 
-// export async function getArticles(id?: string) {
-//   const querySnapshot = await getDocs(articleRef);
-//   const dataArr = querySnapshot.docs.map((doc) => ({
-//     ...doc.data(),
-//     id: doc.id,
-//   }));
-//   // console.log(dataArr)
-//   return id ? dataArr.filter((item) => item.id === id)[0] : dataArr;
-// }
+    const docSnap = await getDoc(docRef);
+    const flowItemList = docSnap.exists() ? docSnap.data().flow || [] : [];
+
+    // Check if the item already exists based on timestamp comparison
+    const exists = flowItemList.some(
+      (item: AccountFlow) =>
+        item.createdOn.toDate().getTime() ===
+        newFlowItem.createdOn.toDate().getTime()
+    );
+
+    if (!exists) {
+      await updateDoc(docRef, {
+        flow: arrayUnion(newFlowItem),
+      });
+      console.log("Saving log updated after pig click.");
+    } else {
+      console.log("Entry already exists, skipping update.");
+    }
+  } catch (error) {
+    console.error("Error updating saving log in Firestore:", error);
+  }
+}
+
+export async function getSavingLog(uid: string | null) {
+  if (!uid) return null;
+  try {
+    const docRef = doc(db, "users", uid, "savingLog", "data");
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return docSnap.data().flow || [];
+    } else {
+      console.log("No saving log found.");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error retrieving saving log from Firestore:", error);
+    return null;
+  }
+}
+
+export default app;

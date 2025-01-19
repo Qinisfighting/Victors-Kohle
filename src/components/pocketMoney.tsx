@@ -20,7 +20,7 @@ import coinincrease from "@/assets/coinincrease.png";
 import { Timestamp } from "firebase/firestore";
 import { TGFormData } from "../../types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../firebase.ts";
+import { addFlowItem, db } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 
 const PocketMoney = () => {
@@ -340,7 +340,7 @@ const PocketMoney = () => {
     setResult("0");
     // setAlertMessage("Das Geld ist im Sparschwein gelandet!");
     // setAlertType("success");
-
+    addFlowItem(uid, currentAmount);
     // Update Firebase
     if (uid) {
       const updatedList = [

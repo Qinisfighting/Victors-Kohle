@@ -11,3 +11,10 @@ export interface Expense {
   expense: number | null;
   createdOn: Timestamp;
 }
+
+export interface AccountFlow {
+  reason: string;
+  amount: number;
+  isPlus: boolean;
+  createdOn: Timestamp;
+}
