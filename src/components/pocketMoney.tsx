@@ -22,6 +22,7 @@ import { TGFormData, UserID } from "../../types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { addFlowItem, db } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { formatToGerman } from "@/utils/format";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -306,13 +307,6 @@ const PocketMoney = () => {
         console.error("Error saving current amount to Firestore:", error);
       }
     }
-  };
-
-  const formatToGerman = (value: number | bigint) => {
-    return new Intl.NumberFormat("de-DE", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
   };
 
   const showCurrentAmount = () => {

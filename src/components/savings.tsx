@@ -4,6 +4,7 @@ import { AccountFlow, UserID } from "../../types";
 import { getSavingLog } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { ThreeDots } from "react-loader-spinner";
+import { formatToGerman } from "@/utils/format";
 
 const Savings = () => {
   const auth = getAuth();
@@ -69,9 +70,13 @@ const Savings = () => {
   }
 
   return (
-    <div>
-      <h2>Total Savings</h2>
-      <p>{totalAmount.toFixed(2)} €</p>
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+      <div className="text-start">
+        <h2 className="text-gray-400">Kontostand</h2>
+        <p className="text-gray-700 font-medium text-4xl">
+          {formatToGerman(parseFloat(totalAmount.toFixed(2)))} €
+        </p>
+      </div>
     </div>
   );
 };
