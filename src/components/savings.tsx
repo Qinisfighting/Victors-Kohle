@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { AccountFlow, UserID } from "../../types";
 import { getSavingLog } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { ThreeDots } from "react-loader-spinner";
 
 const Savings = () => {
   const auth = getAuth();
@@ -51,7 +52,20 @@ const Savings = () => {
   }, [uid]);
 
   if (loading) {
-    return <p>Loading savings...</p>;
+    return (
+      <div className="flex justify-center items-center h-80">
+        <ThreeDots
+          visible={true}
+          height="80"
+          width="80"
+          color="blue"
+          radius="8"
+          ariaLabel="three-dots-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
   }
 
   return (
