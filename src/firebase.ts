@@ -2,7 +2,13 @@ import { initializeApp } from "firebase/app";
 // import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getFirestore, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  runTransaction,
+} from "firebase/firestore";
 import { Timestamp } from "firebase/firestore";
 import { AccountFlow } from "types";
 
@@ -24,7 +30,10 @@ export const auth = getAuth(app);
 export const user = auth.currentUser;
 export const db = getFirestore(app);
 
-export async function addFlowItem(uid: string | null, currentAmount: number) {
+export async function addWeeklyLeftIntoSaving(
+  uid: string | null,
+  currentAmount: number
+) {
   if (!uid) return;
 
   const newFlowItem = {
@@ -60,6 +69,99 @@ export async function addFlowItem(uid: string | null, currentAmount: number) {
     } else {
       console.log("Entry already exists, skipping update.");
     }
+    await updateSavingTotal(uid, newFlowItem.amount);
+  } catch (error) {
+    console.error("Error updating saving log in Firestore:", error);
+  }
+}
+
+export async function addMoneyIntoSaving(
+  uid: string | null,
+  reason: string,
+  plusAmount: number
+) {
+  if (!uid) return;
+
+  const newFlowItem = {
+    reason: reason,
+    amount: parseFloat(plusAmount.toFixed(2)),
+    isPlus: true,
+    createdOn: Timestamp.now(),
+  };
+
+  try {
+    const docRef = doc(db, "users", uid, "savingLog", "data");
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      await setDoc(docRef, { flow: [newFlowItem] });
+      console.log("Saving log initialized with first entry.");
+      return;
+    }
+
+    const flowItemList = docSnap.data().flow || [];
+
+    const exists = flowItemList.some(
+      (item: AccountFlow) =>
+        item.createdOn.toDate().getTime() ===
+        newFlowItem.createdOn.toDate().getTime()
+    );
+
+    if (!exists) {
+      await updateDoc(docRef, {
+        flow: arrayUnion(newFlowItem),
+      });
+      console.log("Saving log updated after plus click.");
+    } else {
+      console.log("Entry already exists, skipping update.");
+    }
+    await updateSavingTotal(uid, newFlowItem.amount);
+  } catch (error) {
+    console.error("Error updating saving log in Firestore:", error);
+  }
+}
+
+export async function substractMoneyFromSaving(
+  uid: string | null,
+  reason: string,
+  minusAmount: number
+) {
+  if (!uid) return;
+
+  const newFlowItem = {
+    reason: reason,
+    amount: parseFloat(minusAmount.toFixed(2)),
+    isPlus: false,
+    createdOn: Timestamp.now(),
+  };
+
+  try {
+    const docRef = doc(db, "users", uid, "savingLog", "data");
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      await setDoc(docRef, { flow: [newFlowItem] });
+      console.log("Saving log initialized with first entry.");
+      return;
+    }
+
+    const flowItemList = docSnap.data().flow || [];
+
+    const exists = flowItemList.some(
+      (item: AccountFlow) =>
+        item.createdOn.toDate().getTime() ===
+        newFlowItem.createdOn.toDate().getTime()
+    );
+
+    if (!exists) {
+      await updateDoc(docRef, {
+        flow: arrayUnion(newFlowItem),
+      });
+      console.log("Saving log updated after plus click.");
+    } else {
+      console.log("Entry already exists, skipping update.");
+    }
+    await updateSavingTotal(uid, -newFlowItem.amount);
   } catch (error) {
     console.error("Error updating saving log in Firestore:", error);
   }
@@ -80,6 +182,50 @@ export async function getSavingLog(uid: string | null) {
   } catch (error) {
     console.error("Error retrieving saving log from Firestore:", error);
     return null;
+  }
+}
+
+export const getSavingTotal = async (uid: string): Promise<number> => {
+  try {
+    const totalDocRef = doc(db, "users", uid, "amount", "savingTotalAmountDoc");
+    const docSnap = await getDoc(totalDocRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      return data.total ?? 0;
+    } else {
+      await setDoc(totalDocRef, { total: 0 });
+      return 0;
+    }
+  } catch (error) {
+    console.error("Error fetching saving total: ", error);
+    throw error;
+  }
+};
+
+export async function updateSavingTotal(
+  uid: string,
+  delta: number
+): Promise<void> {
+  if (!uid) return;
+
+  const totalDocRef = doc(db, "users", uid, "amount", "savingTotalAmountDoc");
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const totalDoc = await transaction.get(totalDocRef);
+
+      if (!totalDoc.exists()) {
+        // If the document does not exist, initialize it with the delta.
+        transaction.set(totalDocRef, { total: delta });
+      } else {
+        const currentTotal = totalDoc.data().total || 0;
+        transaction.update(totalDocRef, { total: currentTotal + delta });
+      }
+    });
+    console.log(`Updated saving total by ${delta}`);
+  } catch (error) {
+    console.error("Error updating saving total:", error);
+    throw error;
   }
 }
 

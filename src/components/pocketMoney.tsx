@@ -20,9 +20,10 @@ import coinincrease from "@/assets/coinincrease.png";
 import { Timestamp } from "firebase/firestore";
 import { TGFormData, UserID } from "../../types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { addFlowItem, db } from "../firebase.ts";
+import { addWeeklyLeftIntoSaving, db } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { formatToGerman } from "@/utils/format";
+import { useToast } from "@/hooks/use-toast";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -49,9 +50,9 @@ const PocketMoney = () => {
   const { width, height } = useWindowSize();
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<"success" | "error" | null>(null);
-
   const collectionName = "amount";
   const documentId = "weeklyStartingAmountDoc";
+  const { toast } = useToast();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -332,9 +333,11 @@ const PocketMoney = () => {
     setCurrentAmount(0);
     setStartingAmount("0");
     setResult("0");
-    // setAlertMessage("Das Geld ist im Sparschwein gelandet!");
-    // setAlertType("success");
-    addFlowItem(uid, currentAmount);
+    addWeeklyLeftIntoSaving(uid, currentAmount);
+    toast({
+      title: "Das Geld ist im Sparschwein gelandet!",
+      description: "Du hast jetzt mehr € in deinem Sparkonto!",
+    });
     // Update Firebase
     if (uid) {
       const updatedList = [

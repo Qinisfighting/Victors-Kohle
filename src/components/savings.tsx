@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 // import { Timestamp } from "firebase/firestore";
-import { AccountFlow, UserID } from "../../types";
-import { getSavingLog } from "../firebase.ts";
+import { UserID } from "../../types";
+// import { getSavingLog } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { ThreeDots } from "react-loader-spinner";
 import { formatToGerman } from "@/utils/format";
+import { getSavingTotal } from "../firebase";
 
 const Savings = () => {
   const auth = getAuth();
@@ -30,26 +31,22 @@ const Savings = () => {
   }, [auth]);
 
   useEffect(() => {
-    const fetchSavingLog = async () => {
+    const fetchTotalAmount = async () => {
       if (!uid) return;
 
       try {
         setLoading(true);
-        const flow: AccountFlow[] = (await getSavingLog(uid)) || [];
-
-        // Calculate sum of amounts
-        const total = flow.reduce((acc, item) => acc + item.amount, 0);
-        console.log(total);
-        console.log(uid);
+        const total = await getSavingTotal(uid);
+        console.log("Running total:", total);
         setTotalAmount(total);
       } catch (error) {
-        console.error("Error fetching saving log:", error);
+        console.error("Error fetching saving total:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSavingLog();
+    fetchTotalAmount();
   }, [uid]);
 
   if (loading) {

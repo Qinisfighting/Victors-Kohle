@@ -3,6 +3,7 @@ import "./App.css";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Day from "./components/day";
 import PocketMoney from "@/components/pocketMoney";
+import { Toaster } from "@/components/ui/toaster";
 import Savings from "@/components/savings";
 import SignIn from "@/components/signIn";
 import { UserAuth } from "./context/AuthContext";
@@ -48,6 +49,7 @@ function App() {
             </div>
           )}
         </div>
+        <Toaster />
         <footer className="text-center text-gray-500 text-xs mt-16">
           © {new Date().getFullYear()} by{" "}
           <a
