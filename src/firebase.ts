@@ -37,7 +37,7 @@ export async function addWeeklyLeftIntoSaving(
   if (!uid) return;
 
   const newFlowItem = {
-    reason: "Tachengeld",
+    reason: "Tachengeld-Rest",
     amount: parseFloat(currentAmount.toFixed(2)),
     isPlus: true,
     createdOn: Timestamp.now(),
@@ -81,10 +81,10 @@ export async function addMoneyIntoSaving(
   plusAmount: number
 ) {
   if (!uid) return;
-
+  const plusAmountAjusted = parseFloat(plusAmount.toString().replace(",", "."));
   const newFlowItem = {
     reason: reason,
-    amount: parseFloat(plusAmount.toFixed(2)),
+    amount: parseFloat(plusAmountAjusted.toFixed(2)),
     isPlus: true,
     createdOn: Timestamp.now(),
   };
@@ -115,22 +115,24 @@ export async function addMoneyIntoSaving(
     } else {
       console.log("Entry already exists, skipping update.");
     }
-    await updateSavingTotal(uid, newFlowItem.amount);
   } catch (error) {
     console.error("Error updating saving log in Firestore:", error);
   }
 }
 
-export async function substractMoneyFromSaving(
+export async function subtractMoneyFromSaving(
   uid: string | null,
   reason: string,
   minusAmount: number
 ) {
   if (!uid) return;
+  const minusAmountAjusted = parseFloat(
+    minusAmount.toString().replace(",", ".")
+  );
 
   const newFlowItem = {
     reason: reason,
-    amount: parseFloat(minusAmount.toFixed(2)),
+    amount: parseFloat(minusAmountAjusted.toFixed(2)),
     isPlus: false,
     createdOn: Timestamp.now(),
   };
@@ -161,7 +163,6 @@ export async function substractMoneyFromSaving(
     } else {
       console.log("Entry already exists, skipping update.");
     }
-    await updateSavingTotal(uid, -newFlowItem.amount);
   } catch (error) {
     console.error("Error updating saving log in Firestore:", error);
   }

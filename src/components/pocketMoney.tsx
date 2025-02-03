@@ -54,7 +54,7 @@ const PocketMoney = () => {
   const collectionName = "amount";
   const documentId = "weeklyStartingAmountDoc";
   const { toast } = useToast();
-  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [, setTotalAmount] = useState<number>(0);
 
   const isButtonDisabled =
     startingAmount === "0" ||
@@ -141,12 +141,15 @@ const PocketMoney = () => {
   const handleStartingAmountChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const newAmount = parseFloat(e.target.value);
+    let newAmount = e.target.value;
+    newAmount = e.target.value.replace(",", ".");
     setStartingAmount(newAmount.toString());
     if (uid) {
       try {
         const docRef = doc(db, "users", uid, collectionName, documentId);
-        await setDoc(docRef, { startingAmount: newAmount.toString() });
+        await setDoc(docRef, {
+          startingAmount: newAmount.toString().replace(",", "."),
+        });
         console.log("Starting amount updated successfully in Firestore!");
       } catch (error) {
         console.error("Error updating starting amount:", error);
@@ -237,15 +240,12 @@ const PocketMoney = () => {
   const handleCalculate = async () => {
     let expense = 0;
     let resultNumber = 0;
-    if (dailyExpense.includes(",") || result.includes(",")) {
-      const normalizedDailyExpense = dailyExpense.replace(",", ".");
-      const normalizedResult = result.replace(",", ".");
-      expense = parseFloat(normalizedDailyExpense);
-      resultNumber = parseFloat(normalizedResult);
-    } else {
-      expense = parseFloat(dailyExpense);
-      resultNumber = parseFloat(result);
-    }
+
+    const normalizedDailyExpense = dailyExpense.replace(",", ".");
+    const normalizedResult = result.replace(",", ".");
+    expense = parseFloat(normalizedDailyExpense);
+    resultNumber = parseFloat(normalizedResult);
+
     if (
       isNaN(expense) ||
       expense < 0 ||
@@ -365,25 +365,32 @@ const PocketMoney = () => {
     calculateCurrentAmount();
   }, [startingAmount, expensesList]);
 
-  const handlePigClick = () => {
+  const handlePigClick = async () => {
     setExpensesList([{ day: "", expense: null, createdOn: Timestamp.now() }]);
     setCurrentAmount(0);
     setStartingAmount("0");
     setResult("0");
-    addWeeklyLeftIntoSaving(uid, currentAmount);
-    toast({
-      title: "Das Geld ist im Sparschwein gelandet!",
-      description: (
-        <span>
-          Du hast jetzt{" "}
-          <strong style={{ fontSize: "1.2em" }}>
-            {formatToGerman(parseFloat(totalAmount.toFixed(2)))}€
-          </strong>{" "}
-          in deinem Sparkonto!
-        </span>
-      ),
-      variant: "destructive",
-    });
+
+    await addWeeklyLeftIntoSaving(uid, currentAmount);
+
+    if (uid) {
+      const total = await getSavingTotal(uid); // Await the function
+      setTotalAmount(total); // Ensure totalAmount is updated
+
+      toast({
+        title: "Das Geld ist im Sparschwein gelandet!",
+        description: (
+          <span>
+            Du hast jetzt{" "}
+            <strong style={{ fontSize: "1.2em" }}>
+              {formatToGerman(parseFloat(total.toFixed(2)))}€
+            </strong>{" "}
+            in deinem Sparkonto!
+          </span>
+        ),
+        variant: "destructive",
+      });
+    }
 
     // Update Firebase
     if (uid) {
@@ -392,11 +399,12 @@ const PocketMoney = () => {
       ];
       try {
         const docRef = doc(db, "users", uid, "expensesList", "data");
-        setDoc(docRef, { expenses: updatedList });
+        await setDoc(docRef, { expenses: updatedList });
         console.log("Expenses list updated after pig click.");
       } catch (error) {
         console.error("Error updating expenses list in Firestore:", error);
       }
+
       try {
         const docRef = doc(
           db,
@@ -405,14 +413,15 @@ const PocketMoney = () => {
           "amount",
           "weeklyStartingAmountDoc"
         );
-        setDoc(docRef, { startingAmount: "0" });
+        await setDoc(docRef, { startingAmount: "0" });
         console.log("Starting amount saved to Firestore!");
       } catch (error) {
         console.error("Error saving starting amount to Firestore:", error);
       }
+
       try {
         const docRef = doc(db, "users", uid, "amount", "currentAmountDoc");
-        setDoc(docRef, { currentAmount: 0 });
+        await setDoc(docRef, { currentAmount: 0 });
         console.log("Current amount saved to Firestore!");
       } catch (error) {
         console.error("Error saving current amount to Firestore:", error);
