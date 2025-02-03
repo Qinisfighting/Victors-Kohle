@@ -24,6 +24,7 @@ import { addWeeklyLeftIntoSaving, db } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { formatToGerman } from "@/utils/format";
 import { useToast } from "@/hooks/use-toast";
+import { getSavingTotal } from "../firebase";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -53,6 +54,7 @@ const PocketMoney = () => {
   const collectionName = "amount";
   const documentId = "weeklyStartingAmountDoc";
   const { toast } = useToast();
+  const [totalAmount, setTotalAmount] = useState<number>(0);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -106,6 +108,21 @@ const PocketMoney = () => {
 
       fetchStartingAmount();
     }
+  }, [uid]);
+
+  useEffect(() => {
+    const fetchTotalAmount = async () => {
+      if (!uid) return;
+
+      try {
+        const total = await getSavingTotal(uid);
+        console.log("Running total:", total);
+        setTotalAmount(total);
+      } catch (error) {
+        console.error("Error fetching saving total:", error);
+      }
+    };
+    fetchTotalAmount();
   }, [uid]);
 
   // Save `startingAmount`
@@ -336,8 +353,17 @@ const PocketMoney = () => {
     addWeeklyLeftIntoSaving(uid, currentAmount);
     toast({
       title: "Das Geld ist im Sparschwein gelandet!",
-      description: "Du hast jetzt mehr € in deinem Sparkonto!",
+      description: (
+        <span>
+          Du hast jetzt{" "}
+          <strong style={{ fontSize: "1.1em" }}>
+            {formatToGerman(parseFloat(totalAmount.toFixed(2)))}€
+          </strong>{" "}
+          in deinem Sparkonto!
+        </span>
+      ),
     });
+
     // Update Firebase
     if (uid) {
       const updatedList = [
