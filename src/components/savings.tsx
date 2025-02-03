@@ -74,6 +74,28 @@ const Savings = () => {
           {formatToGerman(parseFloat(totalAmount.toFixed(2)))} €
         </p>
       </div>
+      <div className="flex justify-between items-center space-x-1 my-4 gap-2">
+        <label className="font-medium text-md text-left">Zweck</label>
+        <input
+          type="text"
+          className="w-52 p-2 border border-gray-300 rounded-lg bg-white"
+        />
+      </div>
+      <div className="flex justify-between items-center space-x-1 my-4 gap-2">
+        <label className="font-medium text-md text-left">Betrag(€)</label>
+        <input
+          type="number"
+          className="w-52 p-2 border border-gray-300 rounded-lg bg-white"
+        />
+      </div>
+      <div>
+        <button className="my-2 mr-2 bg-blue-500 hover:bg-blue-600 text-white font-bold p-1 w-36 rounded border-none">
+          Geld einzahlen
+        </button>
+        <button className="my-2 bg-red-500 hover:bg-red-600 text-white font-bold p-1 w-36 rounded border-none">
+          Geld entnehmen
+        </button>
+      </div>
     </div>
   );
 };
