@@ -376,7 +376,7 @@ const PocketMoney = () => {
       description: (
         <span>
           Du hast jetzt{" "}
-          <strong style={{ fontSize: "1.1em" }}>
+          <strong style={{ fontSize: "1.2em" }}>
             {formatToGerman(parseFloat(totalAmount.toFixed(2)))}€
           </strong>{" "}
           in deinem Sparkonto!

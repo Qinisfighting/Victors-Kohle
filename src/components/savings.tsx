@@ -68,7 +68,7 @@ const Savings = () => {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-      <div className="text-start">
+      <div className="text-start mb-8">
         <h2 className="text-gray-400">Kontostand</h2>
         <p className="text-gray-700 font-medium text-4xl">
           {formatToGerman(parseFloat(totalAmount.toFixed(2)))} €
@@ -78,22 +78,22 @@ const Savings = () => {
         <label className="font-medium text-md text-left">Zweck</label>
         <input
           type="text"
-          className="w-52 p-1 border border-gray-300 rounded-lg bg-white"
+          className="w-48 p-1 border border-gray-300 rounded-lg bg-white"
         />
       </div>
       <div className="flex justify-between items-center space-x-1 my-4 gap-2">
         <label className="font-medium text-md text-left">Betrag(€)</label>
         <input
           type="number"
-          className="w-52 p-1 border border-gray-300 rounded-lg bg-white"
+          className="w-48 p-1 border border-gray-300 rounded-lg bg-white"
         />
       </div>
-      <div className="flex justify-between items-center space-x-1 my-4 gap-2">
-        <button className="my-2 mr-2 bg-blue-500 hover:bg-blue-600 text-white font-bold p-1 w-36 rounded border-none">
-          Geld einzahlen
+      <div className="flex justify-between items-center my-4 gap-2">
+        <button className="my-2 mr-2 bg-blue-500 hover:bg-blue-600 text-white font-bold p-1 w-32 rounded border-none">
+          + Einzahlen
         </button>
-        <button className="my-2 bg-red-500 hover:bg-red-600 text-white font-bold p-1 w-36 rounded border-none">
-          Geld entnehmen
+        <button className="my-2 ml-2 bg-red-500 hover:bg-red-600 text-white font-bold p-1 w-32 rounded border-none">
+          - Entnehmen
         </button>
       </div>
     </div>
