@@ -40,10 +40,10 @@ const PocketMoney = () => {
   const [, setUser] = useState<User | null>(null);
   const [uid, setUid] = useState<UserID>(null);
   const [selectedDay, setSelectedDay] = useState("");
-  const [dailyExpense, setDailyExpense] = useState<string>("0");
-  const [result, setResult] = useState<string>("0");
+  const [dailyExpense, setDailyExpense] = useState<string>("");
+  const [result, setResult] = useState<string>("");
   const [isResultCorrect, setIsResultCorrect] = useState<boolean>(false);
-  const [startingAmount, setStartingAmount] = useState<string>("0");
+  const [startingAmount, setStartingAmount] = useState<string>("");
   const [currentAmount, setCurrentAmount] = useState(0);
   const [expensesList, setExpensesList] = useState<TGFormData[]>([
     { day: "", expense: null, createdOn: Timestamp.now() },
@@ -55,6 +55,18 @@ const PocketMoney = () => {
   const documentId = "weeklyStartingAmountDoc";
   const { toast } = useToast();
   const [totalAmount, setTotalAmount] = useState<number>(0);
+
+  const isButtonDisabled =
+    startingAmount === "0" ||
+    startingAmount === "" ||
+    dailyExpense === "" ||
+    dailyExpense === "0";
+
+  const isPigDisabled =
+    currentAmount <= 0 ||
+    isNaN(currentAmount) ||
+    startingAmount === "0" ||
+    startingAmount === "";
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -223,9 +235,17 @@ const PocketMoney = () => {
   };
 
   const handleCalculate = async () => {
-    const expense = parseFloat(dailyExpense);
-    const resultNumber = parseFloat(result);
-
+    let expense = 0;
+    let resultNumber = 0;
+    if (dailyExpense.includes(",") || result.includes(",")) {
+      const normalizedDailyExpense = dailyExpense.replace(",", ".");
+      const normalizedResult = result.replace(",", ".");
+      expense = parseFloat(normalizedDailyExpense);
+      resultNumber = parseFloat(normalizedResult);
+    } else {
+      expense = parseFloat(dailyExpense);
+      resultNumber = parseFloat(result);
+    }
     if (
       isNaN(expense) ||
       expense < 0 ||
@@ -237,7 +257,7 @@ const PocketMoney = () => {
       return;
     }
 
-    if (currentAmount - expense !== parseFloat(result)) {
+    if (currentAmount - expense !== resultNumber) {
       setAlertMessage(getRandomErrAlert());
       setAlertType("error");
       return;
@@ -362,6 +382,7 @@ const PocketMoney = () => {
           in deinem Sparkonto!
         </span>
       ),
+      variant: "destructive",
     });
 
     // Update Firebase
@@ -429,7 +450,8 @@ const PocketMoney = () => {
       <div className="flex items-center space-x-4 mb-4">
         <label className="font-medium mb-2 w-1/2 text-left">Einkommen(€)</label>
         <Input
-          type="number"
+          type="text"
+          placeholder="Startbetrag?"
           value={startingAmount}
           onClick={() => setStartingAmount("")}
           onChange={handleStartingAmountChange}
@@ -472,7 +494,10 @@ const PocketMoney = () => {
         <span className="w-1/3 text-right">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button className="w-8 h-8 bg-transparent border-none p-0 hover:animate-shakeUp hover:border-none">
+              <button
+                disabled={isPigDisabled}
+                className="w-8 h-8 bg-transparent border-none p-0 hover:animate-shakeUp hover:border-none disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <img
                   src={coinincrease}
                   className="m-auto p-0"
@@ -514,7 +539,7 @@ const PocketMoney = () => {
           ))}
         </select>
         <Input
-          type="number"
+          type="text"
           placeholder="€ Ausgaben"
           onClick={() => setDailyExpense("")}
           value={dailyExpense}
@@ -525,7 +550,7 @@ const PocketMoney = () => {
       <div className="flex items-center space-x-4 mb-4">
         <label className="font-medium mb-2 w-1/2 text-left">Ergebnis(€)</label>
         <Input
-          type="number"
+          type="text"
           placeholder="Wie viel bleibt?"
           value={result}
           onClick={() => setResult("")}
@@ -535,8 +560,9 @@ const PocketMoney = () => {
       </div>
 
       <button
+        disabled={isButtonDisabled}
         onClick={handleCalculate}
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg mb-4"
+        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Ergebnis prüfen
       </button>
