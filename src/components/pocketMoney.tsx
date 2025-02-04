@@ -44,6 +44,8 @@ const PocketMoney = () => {
   const [result, setResult] = useState<string>("");
   const [isResultCorrect, setIsResultCorrect] = useState<boolean>(false);
   const [startingAmount, setStartingAmount] = useState<string>("");
+  const [displayStartingAmount, setDisplayStartingAmount] =
+    useState<string>("0,00");
   const [currentAmount, setCurrentAmount] = useState(0);
   const [expensesList, setExpensesList] = useState<TGFormData[]>([
     { day: "", expense: null, createdOn: Timestamp.now() },
@@ -110,6 +112,7 @@ const PocketMoney = () => {
             const data = docSnap.data() as { startingAmount: string };
             setStartingAmount(data.startingAmount);
             setCurrentAmount(parseFloat(data.startingAmount));
+            setDisplayStartingAmount(data.startingAmount.replace(".", ","));
           } else {
             console.log("No such document for user!");
           }
@@ -152,6 +155,7 @@ const PocketMoney = () => {
   const handleStartingAmountChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
+    setDisplayStartingAmount(e.target.value);
     const newAmount = e.target.value.replace(",", ".");
     setStartingAmount(newAmount);
     if (uid) {
@@ -255,6 +259,7 @@ const PocketMoney = () => {
     const normalizedResult = result.replace(",", ".");
     expense = parseFloat(normalizedDailyExpense);
     resultNumber = parseFloat(normalizedResult);
+    setCurrentAmount(parseFloat(currentAmount.toString().replace(",", ".")));
 
     if (
       isNaN(expense) ||
@@ -471,9 +476,10 @@ const PocketMoney = () => {
         <Input
           type="text"
           placeholder="Startbetrag?"
-          // value={displayStartingAmount}
-          value={startingAmount}
-          onClick={() => setStartingAmount("")}
+          value={displayStartingAmount}
+          onClick={() => setDisplayStartingAmount("")}
+          // value={startingAmount}
+          //onClick={() => setStartingAmount("")}
           onChange={handleStartingAmountChange}
           className="w-1/2 p-2 border border-gray-300 rounded-lg bg-white"
         />
