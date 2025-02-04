@@ -41,6 +41,7 @@ const PocketMoney = () => {
   const [uid, setUid] = useState<UserID>(null);
   const [selectedDay, setSelectedDay] = useState("");
   const [dailyExpense, setDailyExpense] = useState<string>("");
+  const [displayStartingAmount, setDisplayStartingAmount] = useState("");
   const [result, setResult] = useState<string>("");
   const [isResultCorrect, setIsResultCorrect] = useState<boolean>(false);
   const [startingAmount, setStartingAmount] = useState<string>("");
@@ -55,6 +56,7 @@ const PocketMoney = () => {
   const documentId = "weeklyStartingAmountDoc";
   const { toast } = useToast();
   const [, setTotalAmount] = useState<number>(0);
+  const [isAlertHidden, setIsAlertHidden] = useState<boolean>(true);
 
   const isButtonDisabled =
     startingAmount === "0" ||
@@ -141,14 +143,15 @@ const PocketMoney = () => {
   const handleStartingAmountChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    let newAmount = e.target.value;
-    newAmount = e.target.value.replace(",", ".");
-    setStartingAmount(newAmount.toString());
+    const newAmountValue = e.target.value;
+    setDisplayStartingAmount(newAmountValue);
+    const adjustedValue = newAmountValue.replace(",", ".");
+    setStartingAmount(adjustedValue);
     if (uid) {
       try {
         const docRef = doc(db, "users", uid, collectionName, documentId);
         await setDoc(docRef, {
-          startingAmount: newAmount.toString().replace(",", "."),
+          startingAmount: adjustedValue,
         });
         console.log("Starting amount updated successfully in Firestore!");
       } catch (error) {
@@ -435,6 +438,7 @@ const PocketMoney = () => {
         <Alert
           className="mb-6 py-2"
           variant={alertType === "error" ? "destructive" : "default"}
+          hidden={isAlertHidden}
         >
           <AlertTitle>
             {alertType === "error" ? (
@@ -461,7 +465,7 @@ const PocketMoney = () => {
         <Input
           type="text"
           placeholder="Startbetrag?"
-          value={startingAmount}
+          value={displayStartingAmount}
           onClick={() => setStartingAmount("")}
           onChange={handleStartingAmountChange}
           className="w-1/2 p-2 border border-gray-300 rounded-lg bg-white"
