@@ -56,7 +56,6 @@ const PocketMoney = () => {
   const documentId = "weeklyStartingAmountDoc";
   const { toast } = useToast();
   const [, setTotalAmount] = useState<number>(0);
-  const [isAlertHidden, setIsAlertHidden] = useState<boolean>(true);
 
   const isButtonDisabled =
     startingAmount === "0" ||
@@ -138,6 +137,17 @@ const PocketMoney = () => {
     };
     fetchTotalAmount();
   }, [uid]);
+
+  useEffect(() => {
+    if (alertMessage && alertType) {
+      const timer = setTimeout(() => {
+        setAlertMessage(null);
+        setAlertType(null);
+      }, 7000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [alertMessage, alertType]);
 
   // Save `startingAmount`
   const handleStartingAmountChange = async (
@@ -438,7 +448,6 @@ const PocketMoney = () => {
         <Alert
           className="mb-6 py-2"
           variant={alertType === "error" ? "destructive" : "default"}
-          hidden={isAlertHidden}
         >
           <AlertTitle>
             {alertType === "error" ? (
@@ -465,7 +474,8 @@ const PocketMoney = () => {
         <Input
           type="text"
           placeholder="Startbetrag?"
-          value={displayStartingAmount}
+          // value={displayStartingAmount}
+          value={startingAmount}
           onClick={() => setStartingAmount("")}
           onChange={handleStartingAmountChange}
           className="w-1/2 p-2 border border-gray-300 rounded-lg bg-white"
