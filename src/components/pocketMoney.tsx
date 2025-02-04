@@ -41,7 +41,6 @@ const PocketMoney = () => {
   const [uid, setUid] = useState<UserID>(null);
   const [selectedDay, setSelectedDay] = useState("");
   const [dailyExpense, setDailyExpense] = useState<string>("");
-  const [displayStartingAmount, setDisplayStartingAmount] = useState("");
   const [result, setResult] = useState<string>("");
   const [isResultCorrect, setIsResultCorrect] = useState<boolean>(false);
   const [startingAmount, setStartingAmount] = useState<string>("");
@@ -153,15 +152,13 @@ const PocketMoney = () => {
   const handleStartingAmountChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const newAmountValue = e.target.value;
-    setDisplayStartingAmount(newAmountValue);
-    const adjustedValue = newAmountValue.replace(",", ".");
-    setStartingAmount(adjustedValue);
+    const newAmount = e.target.value.replace(",", ".");
+    setStartingAmount(newAmount);
     if (uid) {
       try {
         const docRef = doc(db, "users", uid, collectionName, documentId);
         await setDoc(docRef, {
-          startingAmount: adjustedValue,
+          startingAmount: newAmount,
         });
         console.log("Starting amount updated successfully in Firestore!");
       } catch (error) {
