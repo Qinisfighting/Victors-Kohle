@@ -12,6 +12,8 @@ import {
   addMoneyIntoSaving,
   updateSavingTotal,
 } from "../firebase";
+import { columns } from "./cashFlow/columns";
+import { DataTable } from "./cashFlow/data-table";
 
 const Savings = () => {
   const auth = getAuth();
@@ -19,7 +21,7 @@ const Savings = () => {
   const [uid, setUid] = useState<UserID>(null);
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
-  const [, setSavingLog] = useState<AccountFlow[]>([]);
+  const [savingLog, setSavingLog] = useState<AccountFlow[]>([]);
   const [form, setForm] = useState<AccountFlow>({
     reason: "",
     amount: 0,
@@ -79,7 +81,7 @@ const Savings = () => {
     };
 
     fetchSavingLog();
-  }, [uid]);
+  }, [uid, totalAmount]);
 
   if (loading) {
     return (
@@ -187,6 +189,9 @@ const Savings = () => {
           </button>
         </div>
       </form>
+      <div className="container mx-auto py-4">
+        <DataTable columns={columns} data={savingLog} />
+      </div>
     </div>
   );
 };
