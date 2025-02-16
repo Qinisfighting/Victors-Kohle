@@ -189,7 +189,7 @@ const Savings = () => {
           </button>
         </div>
       </form>
-      <div className="container mx-auto py-4">
+      <div className="container mx-auto py-4 text-gray-500">
         <DataTable columns={columns} data={savingLog} />
       </div>
     </div>

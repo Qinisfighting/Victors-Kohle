@@ -37,7 +37,7 @@ export async function addWeeklyLeftIntoSaving(
   if (!uid) return;
 
   const newFlowItem = {
-    reason: "Tachengeld-Rest",
+    reason: "Tachengeld",
     amount: parseFloat(currentAmount.toFixed(2)),
     isPlus: true,
     createdOn: Timestamp.now(),
