@@ -1,7 +1,5 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { formatToGerman } from "@/utils/format";
-import { AccountFlow } from "types";
 import { Timestamp } from "firebase/firestore";
+import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,11 +8,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { deleteLogItem } from "../../firebase";
+import { AccountFlow } from "types";
+import clsx from "clsx";
 
-export const columns: ColumnDef<AccountFlow>[] = [
+export const getColumns = (
+  uid: string | null,
+  onDelete: (deletedItem: AccountFlow) => void // Accept delete callback
+): ColumnDef<AccountFlow>[] => [
   {
     accessorKey: "createdOn",
-    header: "Erstellt am",
+    header: "Datum",
     cell: (cell) => {
       const value = cell.getValue();
       if (value instanceof Timestamp) {
@@ -45,16 +49,39 @@ export const columns: ColumnDef<AccountFlow>[] = [
   {
     accessorKey: "amount",
     header: "Betrag(€)",
-    cell: (cell) => {
-      const value = cell.getValue();
-      const amount = typeof value === "number" && !isNaN(value) ? value : null;
-      return amount !== null ? formatToGerman(amount) : "Kein Wert"; // "Invalid Amount"
+    cell: ({ row }) => {
+      const { amount, isPlus } = row.original;
+
+      // Determine the sign and color based on isPlus
+      const sign = isPlus ? "+" : "-";
+      const textColor = isPlus ? "text-green-500" : "text-red-500";
+
+      return (
+        <span className={clsx("font-bold", textColor)}>
+          {sign}
+          {amount.toFixed(2)}
+        </span>
+      );
     },
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const logItem = row.original;
+
+      const handleDelete = async (event: React.MouseEvent) => {
+        event.preventDefault();
+        if (!uid) {
+          console.error("User is not authenticated.");
+          return;
+        }
+        try {
+          await deleteLogItem(uid, logItem.createdOn as Timestamp);
+          onDelete(logItem); // Call the parent function to update the table
+        } catch (error) {
+          console.error("Error deleting item:", error);
+        }
+      };
 
       return (
         <DropdownMenu>
@@ -68,15 +95,7 @@ export const columns: ColumnDef<AccountFlow>[] = [
               Möchtest du diesen Betrag löschen?
             </DropdownMenuLabel>
             <div className="flex align-middle justify-end space-x-4">
-              <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    payment.createdOn.toDate().toLocaleDateString("de-DE")
-                  )
-                }
-              >
-                Ja
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete}>Ja</DropdownMenuItem>
               <DropdownMenuItem>Nein</DropdownMenuItem>
             </div>
           </DropdownMenuContent>

@@ -3,16 +3,19 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  SortingState,
+  getSortedRowModel,
 } from "@tanstack/react-table";
 
 import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+import { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -23,10 +26,16 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "createdOn", desc: true },
+  ]);
   const table = useReactTable({
     data,
     columns,
+    state: { sorting },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   return (
@@ -34,20 +43,27 @@ export function DataTable<TData, TValue>({
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
+            <>
+              <tr
+                key={headerGroup.id}
+                className=" text-gray-400 font-extraLight text-center"
+              >
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="border border-none p-2 cursor-pointer"
+                    onClick={header.column.getToggleSortingHandler()} // Enable sorting on click
+                  >
+                    {header.column.columnDef.header as string}
+                    {header.column.getIsSorted() === "asc"
+                      ? " ▲"
+                      : header.column.getIsSorted() === "desc"
+                      ? " ▼"
+                      : ""}
+                  </th>
+                ))}
+              </tr>
+            </>
           ))}
         </TableHeader>
         <TableBody>

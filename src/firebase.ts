@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 // import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { getFirestore, setDoc } from "firebase/firestore";
+import { arrayRemove, getFirestore, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import {
   doc,
@@ -183,6 +183,42 @@ export async function getSavingLog(uid: string | null) {
   } catch (error) {
     console.error("Error retrieving saving log from Firestore:", error);
     return null;
+  }
+}
+
+export async function deleteLogItem(uid: string | null, createdOn: Timestamp) {
+  if (!uid) return;
+
+  try {
+    const docRef = doc(db, "users", uid, "savingLog", "data");
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      console.log("No saving log found.");
+      return;
+    }
+
+    const flowItemList = docSnap.data().flow || [];
+
+    // Find the matching item
+    const itemToDelete = flowItemList.find(
+      (item: AccountFlow) =>
+        item.createdOn.toDate().getTime() === createdOn.toDate().getTime()
+    );
+
+    if (!itemToDelete) {
+      console.log("Item not found in saving log.");
+      return;
+    }
+
+    // Remove the item
+    await updateDoc(docRef, {
+      flow: arrayRemove(itemToDelete),
+    });
+
+    console.log("Log item deleted successfully.");
+  } catch (error) {
+    console.error("Error deleting log item from Firestore:", error);
   }
 }
 

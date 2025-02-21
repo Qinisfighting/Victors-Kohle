@@ -12,13 +12,14 @@ import {
   addMoneyIntoSaving,
   updateSavingTotal,
 } from "../firebase";
-import { columns } from "./cashFlow/columns";
+import { getColumns } from "./cashFlow/columns";
 import { DataTable } from "./cashFlow/data-table";
+// import { SortingState } from "@tanstack/react-table";
 
 const Savings = () => {
   const auth = getAuth();
   const [, setUser] = useState<User | null>(null);
-  const [uid, setUid] = useState<UserID>(null);
+  const [uid, setUid] = useState<UserID | null>(null);
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [savingLog, setSavingLog] = useState<AccountFlow[]>([]);
@@ -28,6 +29,7 @@ const Savings = () => {
     isPlus: true,
     createdOn: Timestamp.fromDate(new Date()),
   });
+  // const [sorting, setSorting] = useState<SortingState>([{ id: "createdOn", desc: true }]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -83,6 +85,23 @@ const Savings = () => {
     fetchSavingLog();
   }, [uid, totalAmount]);
 
+  const handleDeleteLogItem = (deletedItem: AccountFlow) => {
+    setSavingLog((prevLog) =>
+      prevLog.filter((item) => item.createdOn !== deletedItem.createdOn)
+    );
+    setTotalAmount(
+      (prevTotal) =>
+        prevTotal -
+        (deletedItem.isPlus ? deletedItem.amount : -deletedItem.amount)
+    );
+    if (uid) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      deletedItem.isPlus
+        ? updateSavingTotal(uid, -deletedItem.amount)
+        : updateSavingTotal(uid, deletedItem.amount);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-80">
@@ -93,36 +112,34 @@ const Savings = () => {
           color="blue"
           radius="8"
           ariaLabel="three-dots-loading"
-          wrapperStyle={{}}
-          wrapperClass=""
         />
       </div>
     );
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent the default form submission behavior
+    e.preventDefault();
     const submitter = (e.nativeEvent as SubmitEvent)
       .submitter as HTMLButtonElement;
 
-    if (!uid) return; // Ensure uid is defined
+    if (!uid) return;
 
-    const amountChange = form.amount; // Use form.amount for transaction delta
+    const amountChange = form.amount;
 
     try {
       if (submitter.value === "deposit") {
         await addMoneyIntoSaving(uid, form.reason, amountChange);
         setTotalAmount((prevTotal) => prevTotal + amountChange);
-        await updateSavingTotal(uid, amountChange); // Pass form.amount instead of totalAmount
+        await updateSavingTotal(uid, amountChange);
       } else if (submitter.value === "withdraw") {
         await subtractMoneyFromSaving(uid, form.reason, amountChange);
         setTotalAmount((prevTotal) => prevTotal - amountChange);
-        await updateSavingTotal(uid, -amountChange); // Pass negative value for withdrawal
+        await updateSavingTotal(uid, -amountChange);
       }
     } catch (error) {
       console.error("Error updating savings:", error);
     }
-    // Optionally reset the form after submission
+
     setForm({
       reason: "",
       amount: 0,
@@ -190,7 +207,14 @@ const Savings = () => {
         </div>
       </form>
       <div className="container mx-auto py-4 text-gray-500">
-        <DataTable columns={columns} data={savingLog} />
+        {savingLog.length === 0 ? (
+          <p>Keine Einträge vorhanden.</p>
+        ) : (
+          <DataTable
+            columns={getColumns(uid, handleDeleteLogItem)}
+            data={savingLog}
+          />
+        )}
       </div>
     </div>
   );
