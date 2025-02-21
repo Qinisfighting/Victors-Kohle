@@ -11,10 +11,22 @@ import {
   subtractMoneyFromSaving,
   addMoneyIntoSaving,
   updateSavingTotal,
+  clearSavingLog,
+  clearTotalAmount,
 } from "../firebase";
 import { getColumns } from "./cashFlow/columns";
 import { DataTable } from "./cashFlow/data-table";
-// import { SortingState } from "@tanstack/react-table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const Savings = () => {
   const auth = getAuth();
@@ -29,7 +41,7 @@ const Savings = () => {
     isPlus: true,
     createdOn: Timestamp.fromDate(new Date()),
   });
-  // const [sorting, setSorting] = useState<SortingState>([{ id: "createdOn", desc: true }]);
+  const isResetDisabled = totalAmount === 0;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -148,16 +160,65 @@ const Savings = () => {
     });
   };
 
+  const handleReset = async () => {
+    if (!uid) return;
+
+    try {
+      const [logCleared, totalCleared] = await Promise.all([
+        clearSavingLog(uid),
+        clearTotalAmount(uid),
+      ]);
+
+      if (logCleared || totalCleared) {
+        // Fetch updated data only if any reset happened
+        const total = await getSavingTotal(uid);
+        const log = await getSavingLog(uid);
+
+        setTotalAmount(total);
+        setSavingLog(log);
+      }
+    } catch (error) {
+      console.error("Error resetting savings:", error);
+    }
+  };
+
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-      <div className="text-start mb-8">
-        <h2 className="text-gray-400">Kontostand</h2>
-        <p className="text-gray-700 font-medium text-4xl">
-          {formatToGerman(parseFloat(totalAmount.toFixed(2)))} €
-        </p>
+      <div className="flex justify-between items-center mb-4 px-2">
+        <div className="text-start mb-4">
+          <h2 className="text-gray-400">Kontostand</h2>
+          <p className="text-gray-700 font-medium text-4xl">
+            {formatToGerman(parseFloat(totalAmount.toFixed(2)))} €
+          </p>
+        </div>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button
+              disabled={isResetDisabled}
+              className="w-12 text-xs bg-transparent p-0 rounded-full border-red-500 text-red-500 hover:bg-red-500 hover:text-white  hover:border-none disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              RESET
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Willst du wirklich alles zurücksetzen?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Deine Kontostand wird auf 0 gesetezt und alle Einträge werden
+                gelöscht.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Nein</AlertDialogCancel>
+              <AlertDialogAction onClick={handleReset}>Ja</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
       <form onSubmit={handleSubmit}>
-        <div className="flex justify-between items-center space-x-1 my-4 gap-2">
+        <div className="flex justify-between items-center space-x-1 mt-0 gap-2">
           <label className="font-medium text-md text-left" htmlFor="reason">
             Zweck
           </label>
@@ -192,7 +253,7 @@ const Savings = () => {
             type="submit"
             name="action"
             value="deposit"
-            className="my-2 mr-2 bg-blue-500 hover:bg-blue-600 text-white font-bold p-1 w-32 rounded border-none"
+            className="my-2 mr-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold p-1 w-32 rounded border-none"
           >
             + Einzahlen
           </button>

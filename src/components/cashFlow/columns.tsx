@@ -54,7 +54,7 @@ export const getColumns = (
 
       // Determine the sign and color based on isPlus
       const sign = isPlus ? "+" : "-";
-      const textColor = isPlus ? "text-green-500" : "text-red-500";
+      const textColor = isPlus ? "text-emerald-500" : "text-red-500";
 
       return (
         <span className={clsx("font-bold", textColor)}>

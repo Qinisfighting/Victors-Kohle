@@ -266,4 +266,59 @@ export async function updateSavingTotal(
   }
 }
 
+export async function clearSavingLog(uid: string | null): Promise<boolean> {
+  if (!uid) return false;
+
+  try {
+    const docRef = doc(db, "users", uid, "savingLog", "data");
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      console.log("No saving log found.");
+      return false;
+    }
+
+    const flowItemList = docSnap.data().flow || [];
+
+    if (flowItemList.length === 0) {
+      console.log("Saving log is already empty.");
+      return false;
+    }
+
+    await updateDoc(docRef, {
+      flow: [],
+    });
+
+    console.log("Saving log cleared successfully.");
+    return true;
+  } catch (error) {
+    console.error("Error clearing saving log in Firestore:", error);
+    return false;
+  }
+}
+
+export async function clearTotalAmount(uid: string | null): Promise<boolean> {
+  if (!uid) return false;
+
+  try {
+    const totalDocRef = doc(db, "users", uid, "amount", "savingTotalAmountDoc");
+    const docSnap = await getDoc(totalDocRef);
+
+    if (!docSnap.exists()) {
+      console.log("No saving total found.");
+      return false;
+    }
+
+    await updateDoc(totalDocRef, {
+      total: 0,
+    });
+
+    console.log("Saving total cleared successfully.");
+    return true;
+  } catch (error) {
+    console.error("Error clearing saving total in Firestore:", error);
+    return false;
+  }
+}
+
 export default app;
