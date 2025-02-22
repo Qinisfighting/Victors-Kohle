@@ -248,7 +248,8 @@ const Savings = () => {
             className="w-48 p-1 border border-gray-300 rounded-lg bg-white"
           />
         </div>
-        <div className="flex justify-between items-center my-4 gap-2">
+
+        <div className="flex justify-between items-center my-2 gap-2">
           <button
             type="submit"
             name="action"
