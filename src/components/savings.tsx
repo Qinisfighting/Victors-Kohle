@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import warning from "@/assets/warning.png";
 
 const Savings = () => {
   const auth = getAuth();
@@ -203,7 +204,10 @@ const Savings = () => {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                Willst du wirklich alles zurücksetzen?
+                <div className="flex text-xl font-semibold">
+                  <img className="w-6 h-6 mr-2" src={warning}></img>
+                  <p>Willst du wirklich alles zurücksetzen?</p>
+                </div>
               </AlertDialogTitle>
               <AlertDialogDescription>
                 Deine Kontostand wird auf 0 gesetezt und alle Einträge werden
