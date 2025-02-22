@@ -11,6 +11,7 @@ import {
 import { deleteLogItem } from "../../firebase";
 import { AccountFlow } from "types";
 import clsx from "clsx";
+import { formatToGerman } from "@/utils/format";
 
 export const getColumns = (
   uid: string | null,
@@ -59,7 +60,7 @@ export const getColumns = (
       return (
         <span className={clsx("font-bold", textColor)}>
           {sign}
-          {amount.toFixed(2)}
+          {formatToGerman(amount)}
         </span>
       );
     },

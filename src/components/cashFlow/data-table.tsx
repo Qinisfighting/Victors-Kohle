@@ -54,7 +54,9 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     // Custom global filter that checks all cells, converting values to strings
     globalFilterFn: (row, _columnId, filterValue) => {
-      const search = String(filterValue).toLowerCase();
+      // Convert the filterValue to a string and normalize the decimal separator
+      const search = String(filterValue).toLowerCase().replace(/,/g, ".");
+
       return row.getAllCells().some((cell) => {
         const value = cell.getValue();
         return (
@@ -74,7 +76,7 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Alle Spalten durchsuchen..."
+          placeholder="Such nach Zweck oder Betrag . . ."
           value={globalFilter}
           onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
