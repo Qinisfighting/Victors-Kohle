@@ -35,7 +35,10 @@ export function DataTable<TData, TValue>({
   ]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [pageSize] = useState(5);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 5,
+  });
 
   const table = useReactTable({
     data,
@@ -44,17 +47,14 @@ export function DataTable<TData, TValue>({
       sorting,
       globalFilter,
       columnFilters,
-      pagination: {
-        pageSize: pageSize,
-        pageIndex: 0,
-      },
+      pagination,
     },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
-    // Custom global filter that checks all cells, converting values to strings
+    onPaginationChange: setPagination,
+
     globalFilterFn: (row, _columnId, filterValue) => {
-      // Convert the filterValue to a string and normalize the decimal separator
       const search = String(filterValue).toLowerCase().replace(/,/g, ".");
 
       return row.getAllCells().some((cell) => {
@@ -136,7 +136,7 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-        <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex items-center justify-end space-x-2 px-2 py-4 ">
           <Button
             variant="outline"
             size="sm"
