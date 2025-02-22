@@ -1,4 +1,4 @@
-##[Pocket Money Manager for Kids](https://victorskohle.netlify.app/)
+[##Pocket Money Manager for Kids](https://victorskohle.netlify.app/)
 
 A fun, lightweight, and educational app for kids to learn money management and practice head calculations!
 
