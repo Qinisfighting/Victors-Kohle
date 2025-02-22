@@ -204,9 +204,9 @@ const Savings = () => {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                <div className="flex text-xl font-semibold">
-                  <img className="w-6 h-6 mr-2" src={warning}></img>
-                  <p>Willst du wirklich alles zurücksetzen?</p>
+                <div className="flex text-lg font-semibold justify-center items-center px-2">
+                  <img className="w-10 h-10 mr-2" src={warning}></img>
+                  Willst du wirklich alles zurücksetzen?
                 </div>
               </AlertDialogTitle>
               <AlertDialogDescription>
