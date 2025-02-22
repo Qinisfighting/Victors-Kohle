@@ -206,7 +206,7 @@ const Savings = () => {
               <AlertDialogTitle>
                 <div className="flex text-lg font-semibold justify-center items-center px-2">
                   <img className="w-10 h-10 mr-2" src={warning}></img>
-                  Willst du wirklich alles zurücksetzen?
+                  Möchtest du wirklich alles zurücksetzen?
                 </div>
               </AlertDialogTitle>
               <AlertDialogDescription>

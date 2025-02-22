@@ -534,7 +534,7 @@ const PocketMoney = () => {
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>
-                  Willst du das Geld in dein Sparschwein tun?
+                  Möchtest du das Geld in dein Sparschwein tun?
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   Deine wöchentliche Ausgabenliste wird gelöscht und der
