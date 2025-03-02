@@ -254,6 +254,7 @@ const PocketMoney = () => {
   const handleCalculate = async () => {
     let expense = 0;
     let resultNumber = 0;
+    const tolerance = 0.01;
 
     const normalizedDailyExpense = dailyExpense.replace(",", ".");
     const normalizedResult = result.replace(",", ".");
@@ -272,7 +273,8 @@ const PocketMoney = () => {
       return;
     }
 
-    if (currentAmount - expense !== resultNumber) {
+    if (Math.abs(currentAmount - expense - resultNumber) > tolerance) {
+      // js deceimal precision issue
       setAlertMessage(getRandomErrAlert());
       setAlertType("error");
       return;
