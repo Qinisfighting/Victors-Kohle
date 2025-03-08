@@ -16,6 +16,7 @@ import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import monster from "@/assets/monster.png";
 import balloon from "@/assets/balloon.png";
+import reset from "@/assets/reset.png";
 import coinincrease from "@/assets/coinincrease.png";
 import { Timestamp } from "firebase/firestore";
 import { TGFormData, UserID } from "../../types";
@@ -57,6 +58,7 @@ const PocketMoney = () => {
   const documentId = "weeklyStartingAmountDoc";
   const { toast } = useToast();
   const [, setTotalAmount] = useState<number>(0);
+  const [isResetShow, setIsResetShow] = useState<boolean>(false);
 
   const isButtonDisabled =
     startingAmount === "0" ||
@@ -75,7 +77,7 @@ const PocketMoney = () => {
       if (currentUser) {
         setUser(currentUser);
         if (currentUser) {
-          setUid(currentUser.uid); // Save the UID for Firestore operations
+          setUid(currentUser.uid);
         }
       } else {
         setUser(null);
@@ -300,7 +302,15 @@ const PocketMoney = () => {
           : item
       );
       setExpensesList(updatedList);
-      setCurrentAmount((prev) => prev - expense);
+      setCurrentAmount((prev) => {
+        const newAmount = prev - expense;
+
+        if (newAmount === 0 && expensesList.length !== 0) {
+          setIsResetShow(true);
+        }
+
+        return newAmount;
+      });
       setDailyExpense("0");
       setResult("0");
       setIsResultCorrect(true);
@@ -312,7 +322,15 @@ const PocketMoney = () => {
       );
 
       setExpensesList(updatedList);
-      setCurrentAmount((prev) => prev - expense);
+      setCurrentAmount((prev) => {
+        const newAmount = prev - expense;
+
+        if (newAmount === 0 && expensesList.length !== 0) {
+          setIsResetShow(true);
+        }
+
+        return newAmount;
+      });
       setDailyExpense("0");
       setResult("0");
       setIsResultCorrect(true);
@@ -387,12 +405,13 @@ const PocketMoney = () => {
     setCurrentAmount(0);
     setStartingAmount("0");
     setResult("0");
+    setDisplayStartingAmount("0");
 
     await addWeeklyLeftIntoSaving(uid, currentAmount);
 
     if (uid) {
-      const total = await getSavingTotal(uid); // Await the function
-      setTotalAmount(total); // Ensure totalAmount is updated
+      const total = await getSavingTotal(uid);
+      setTotalAmount(total);
 
       toast({
         title: "Das Geld ist im Sparschwein gelandet!",
@@ -443,6 +462,54 @@ const PocketMoney = () => {
       } catch (error) {
         console.error("Error saving current amount to Firestore:", error);
       }
+    }
+  };
+
+  const handleReset = async () => {
+    const updatedList = [
+      { day: "", expense: null, createdOn: Timestamp.now() },
+    ];
+    setExpensesList(updatedList);
+    setStartingAmount("0");
+    // setCurrentAmount(0);
+    setResult("0");
+    setIsResetShow(false);
+    setDisplayStartingAmount("0");
+
+    // Update Firebase
+    if (uid) {
+      const updatedList = [
+        { day: "", expense: null, createdOn: Timestamp.now() },
+      ];
+      try {
+        const docRef = doc(db, "users", uid, "expensesList", "data");
+        await setDoc(docRef, { expenses: updatedList });
+        console.log("Expenses list updated after reset click.");
+      } catch (error) {
+        console.error("Error updating expenses list in Firestore:", error);
+      }
+
+      try {
+        const docRef = doc(
+          db,
+          "users",
+          uid,
+          "amount",
+          "weeklyStartingAmountDoc"
+        );
+        await setDoc(docRef, { startingAmount: "0" });
+        console.log("Starting amount saved to Firestore after reset click!");
+      } catch (error) {
+        console.error("Error saving starting amount to Firestore:", error);
+      }
+
+      // try {
+      //   const docRef = doc(db, "users", uid, "amount", "currentAmountDoc");
+      //   await setDoc(docRef, { currentAmount: 0 });
+      //   console.log("Current amount saved to Firestore!");
+      // } catch (error) {
+      //   console.error("Error saving current amount to Firestore:", error);
+      // }
     }
   };
 
@@ -519,39 +586,68 @@ const PocketMoney = () => {
         <span className="w-1/3 text-right font-semibold">
           {showCurrentAmount()}
         </span>
-        <span className="w-1/3 text-right">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button
-                disabled={isPigDisabled}
-                className="w-8 h-8 bg-transparent border-none p-0 hover:animate-shakeUp hover:border-none disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <img
-                  src={coinincrease}
-                  className="m-auto p-0"
-                  title="Sparschwein"
-                />
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Möchtest du das Geld in dein Sparschwein tun?
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  Deine wöchentliche Ausgabenliste wird gelöscht und der
-                  aktuelle Kontostand auf 0 gesetzt.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Nein</AlertDialogCancel>
-                <AlertDialogAction onClick={handlePigClick}>
-                  Ja
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </span>
+        {!isResetShow ? (
+          <span className="w-1/3 text-right">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button
+                  disabled={isPigDisabled}
+                  className="w-8 h-8 bg-transparent border-none p-0 mr-1 hover:animate-shakeUp hover:border-none disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <img
+                    src={coinincrease}
+                    className="m-auto p-0"
+                    title="Sparschwein"
+                  />
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Möchtest du das Geld in dein Sparschwein tun?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Deine wöchentliche Ausgabenliste wird gelöscht und der
+                    aktuelle Kontostand auf 0 gesetzt.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Nein</AlertDialogCancel>
+                  <AlertDialogAction onClick={handlePigClick}>
+                    Ja
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </span>
+        ) : (
+          <span className="w-1/3 text-right">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="w-6 h-6 bg-transparent border-none p-0 mr-2 hover:animate-shakeUp hover:border-none disabled:opacity-50 disabled:cursor-not-allowed">
+                  <img src={reset} className="m-auto p-0" title="Reset" />
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Möchtest du in die neue Woche starten?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Deine aktuelle Ausgabenliste und dein Einkommen werden auf
+                    den Anfangsstand zurückgesetzt.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Nein</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleReset}>
+                    Ja
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </span>
+        )}
       </div>
       {/* Dropdown and Daily Expense */}
       <div className="flex items-center space-x-4 mb-4">
