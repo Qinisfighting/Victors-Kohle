@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.netlify.victorskohle.twa",
+        "sha256_cert_fingerprints": ["4E:EB:88:82:66:22:FD:E7:8E:F2:AC:58:6B:A9:1F:A1:C6:DE:84:0E:47:B8:26:F4:59:63:0C:C1:C3:93:2D:99"]
+      }
+    }]
