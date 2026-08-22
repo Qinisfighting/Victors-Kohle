@@ -60,6 +60,15 @@ function App() {
           >
             QIN's code
           </a>
+          {" · "}
+          <a
+            href="/privacy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-pink-600 text-gray-700"
+          >
+            Datenschutz
+          </a>
         </footer>
       </div>
     </>
