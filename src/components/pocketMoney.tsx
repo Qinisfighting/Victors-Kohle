@@ -94,7 +94,7 @@ const PocketMoney = () => {
   }, []);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout>;
     if (isResultCorrect) {
       timer = setTimeout(() => {
         setIsResultCorrect(false);
@@ -155,7 +155,7 @@ const PocketMoney = () => {
 
   // Save `startingAmount`
   const handleStartingAmountChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setDisplayStartingAmount(e.target.value);
     const newAmount = e.target.value.replace(",", ".");
@@ -299,7 +299,7 @@ const PocketMoney = () => {
               expense: newExpense.expense + (item.expense ?? 0),
               createdOn: item.createdOn,
             }
-          : item
+          : item,
       );
       setExpensesList(updatedList);
       setCurrentAmount((prev) => {
@@ -318,7 +318,7 @@ const PocketMoney = () => {
       updatedList = [...expensesList, newExpense];
 
       updatedList.sort(
-        (a, b) => weekdays.indexOf(a.day) - weekdays.indexOf(b.day)
+        (a, b) => weekdays.indexOf(a.day) - weekdays.indexOf(b.day),
       );
 
       setExpensesList(updatedList);
@@ -392,7 +392,7 @@ const PocketMoney = () => {
     const calculateCurrentAmount = () => {
       const totalExpenses = expensesList.reduce(
         (acc, item) => acc + (item.expense ?? 0),
-        0
+        0,
       );
       setCurrentAmount(parseFloat(startingAmount) - totalExpenses);
     };
@@ -424,7 +424,7 @@ const PocketMoney = () => {
             in deinem Sparkonto!
           </span>
         ),
-        variant: "destructive",
+        variant: "default",
       });
     }
 
@@ -447,7 +447,7 @@ const PocketMoney = () => {
           "users",
           uid,
           "amount",
-          "weeklyStartingAmountDoc"
+          "weeklyStartingAmountDoc",
         );
         await setDoc(docRef, { startingAmount: "0" });
         console.log("Starting amount saved to Firestore!");
@@ -495,7 +495,7 @@ const PocketMoney = () => {
           "users",
           uid,
           "amount",
-          "weeklyStartingAmountDoc"
+          "weeklyStartingAmountDoc",
         );
         await setDoc(docRef, { startingAmount: "0" });
         console.log("Starting amount saved to Firestore after reset click!");
@@ -576,7 +576,7 @@ const PocketMoney = () => {
                   🗑️
                 </button>
               </li>
-            )
+            ),
         )}
       </ul>
 
