@@ -47,29 +47,34 @@ export async function addWeeklyLeftIntoSaving(
     const docRef = doc(db, "users", uid, "savingLog", "data");
     const docSnap = await getDoc(docRef);
 
+    let shouldUpdateTotal = true;
+
     if (!docSnap.exists()) {
       await setDoc(docRef, { flow: [newFlowItem] });
       console.log("Saving log initialized with first entry.");
-      return;
-    }
-
-    const flowItemList = docSnap.data().flow || [];
-
-    const exists = flowItemList.some(
-      (item: AccountFlow) =>
-        item.createdOn.toDate().getTime() ===
-        newFlowItem.createdOn.toDate().getTime()
-    );
-
-    if (!exists) {
-      await updateDoc(docRef, {
-        flow: arrayUnion(newFlowItem),
-      });
-      console.log("Saving log updated after pig click.");
     } else {
-      console.log("Entry already exists, skipping update.");
+      const flowItemList = docSnap.data().flow || [];
+
+      const exists = flowItemList.some(
+        (item: AccountFlow) =>
+          item.createdOn.toDate().getTime() ===
+          newFlowItem.createdOn.toDate().getTime()
+      );
+
+      if (!exists) {
+        await updateDoc(docRef, {
+          flow: arrayUnion(newFlowItem),
+        });
+        console.log("Saving log updated after pig click.");
+      } else {
+        console.log("Entry already exists, skipping update.");
+        shouldUpdateTotal = false;
+      }
     }
-    await updateSavingTotal(uid, newFlowItem.amount);
+
+    if (shouldUpdateTotal) {
+      await updateSavingTotal(uid, newFlowItem.amount);
+    }
   } catch (error) {
     console.error("Error updating saving log in Firestore:", error);
   }
