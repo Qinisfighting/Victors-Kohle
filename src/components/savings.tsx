@@ -28,6 +28,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import warning from "@/assets/warning.png";
+import {
+  calculateSavingTotal,
+  calculateTotalAfterDeletingSaving,
+} from "@/utils/calculations";
 
 const Savings = () => {
   const auth = getAuth();
@@ -102,10 +106,8 @@ const Savings = () => {
     setSavingLog((prevLog) =>
       prevLog.filter((item) => item.createdOn !== deletedItem.createdOn)
     );
-    setTotalAmount(
-      (prevTotal) =>
-        prevTotal -
-        (deletedItem.isPlus ? deletedItem.amount : -deletedItem.amount)
+    setTotalAmount((prevTotal) =>
+      calculateTotalAfterDeletingSaving(prevTotal, deletedItem)
     );
     if (uid) {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -142,11 +144,15 @@ const Savings = () => {
     try {
       if (submitter.value === "deposit") {
         await addMoneyIntoSaving(uid, form.reason, amountChange);
-        setTotalAmount((prevTotal) => prevTotal + amountChange);
+        setTotalAmount((prevTotal) =>
+          calculateSavingTotal(prevTotal, amountChange, "deposit")
+        );
         await updateSavingTotal(uid, amountChange);
       } else if (submitter.value === "withdraw") {
         await subtractMoneyFromSaving(uid, form.reason, amountChange);
-        setTotalAmount((prevTotal) => prevTotal - amountChange);
+        setTotalAmount((prevTotal) =>
+          calculateSavingTotal(prevTotal, amountChange, "withdraw")
+        );
         await updateSavingTotal(uid, -amountChange);
       }
     } catch (error) {

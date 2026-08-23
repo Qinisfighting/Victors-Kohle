@@ -26,6 +26,10 @@ import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { formatToGerman } from "@/utils/format";
 import { useToast } from "@/hooks/use-toast";
 import { getSavingTotal } from "../firebase";
+import {
+  calculateRemainingAmount,
+  validatePocketMoneyCalculation,
+} from "@/utils/calculations";
 
 const PocketMoney = () => {
   const weekdays = [
@@ -254,34 +258,25 @@ const PocketMoney = () => {
   };
 
   const handleCalculate = async () => {
-    let expense = 0;
-    let resultNumber = 0;
-    const tolerance = 0.01;
+    const calculation = validatePocketMoneyCalculation(
+      currentAmount,
+      dailyExpense,
+      result,
+    );
 
-    const normalizedDailyExpense = dailyExpense.replace(",", ".");
-    const normalizedResult = result.replace(",", ".");
-    expense = parseFloat(normalizedDailyExpense);
-    resultNumber = parseFloat(normalizedResult);
-    setCurrentAmount(parseFloat(currentAmount.toString().replace(",", ".")));
-
-    if (
-      isNaN(expense) ||
-      expense < 0 ||
-      isNaN(resultNumber) ||
-      resultNumber < 0
-    ) {
+    if (calculation.status === "invalid") {
       setAlertMessage("Gib bitte eine gültige Zahl ein.");
       setAlertType("error");
       return;
     }
 
-    if (Math.abs(currentAmount - expense - resultNumber) > tolerance) {
-      // js deceimal precision issue
+    if (calculation.status === "incorrect") {
       setAlertMessage(getRandomErrAlert());
       setAlertType("error");
       return;
     }
 
+    const { expense } = calculation;
     setAlertMessage(getRandomPraise());
     setAlertType("success");
 
@@ -390,11 +385,7 @@ const PocketMoney = () => {
 
   useEffect(() => {
     const calculateCurrentAmount = () => {
-      const totalExpenses = expensesList.reduce(
-        (acc, item) => acc + (item.expense ?? 0),
-        0,
-      );
-      setCurrentAmount(parseFloat(startingAmount) - totalExpenses);
+      setCurrentAmount(calculateRemainingAmount(startingAmount, expensesList));
     };
 
     calculateCurrentAmount();
