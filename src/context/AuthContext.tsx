@@ -17,6 +17,7 @@ export const AuthContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const googleSignIn = async () => {
     const provider = new GoogleAuthProvider();
      // await signInWithRedirect(auth, provider);
@@ -30,6 +31,7 @@ export const AuthContextProvider = ({
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setAuthLoading(false);
       console.log("User", currentUser);
     });
     return () => {
@@ -38,7 +40,7 @@ export const AuthContextProvider = ({
   }, [user]);
 
   return (
-    <AuthContext.Provider value={{ googleSignIn, logOut, user }}>
+    <AuthContext.Provider value={{ googleSignIn, logOut, user, authLoading }}>
       {children}
     </AuthContext.Provider>
   );

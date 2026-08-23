@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Timestamp } from "firebase/firestore";
 import { UserID } from "../../types";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { ThreeDots } from "react-loader-spinner";
+import Loader from "@/components/loader";
 import { formatToGerman } from "@/utils/format";
 import { AccountFlow } from "types";
 import {
@@ -120,14 +120,7 @@ const Savings = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-80">
-        <ThreeDots
-          visible={true}
-          height="80"
-          width="80"
-          color="blue"
-          radius="8"
-          ariaLabel="three-dots-loading"
-        />
+        <Loader />
       </div>
     );
   }

@@ -8,10 +8,21 @@ import Savings from "@/components/savings";
 import SignIn from "@/components/signIn";
 import { UserAuth } from "./context/AuthContext";
 import { User } from "firebase/auth";
-import logo from "./assets/logo.png";
+import logo from "./assets/logo.webp";
+import Loader from "@/components/loader";
 
 function App() {
-  const { user }: { user: User | null } = UserAuth() as { user: User | null };
+  const { user, authLoading }: { user: User | null; authLoading: boolean } =
+    UserAuth() as { user: User | null; authLoading: boolean };
+
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen w-full">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex flex-col items-strech justify-around min-h-screen w-full">
@@ -19,8 +30,12 @@ function App() {
           <div className="text-center border-b border-dashed border-gray-800 border-opacity-50">
             <img
               src={logo}
-              alt="logo"
-              className="inline-block w-32 h-32 mb-4 mx-auto "
+              alt="Victors Kohle"
+              width="512"
+              height="429"
+              loading="eager"
+              fetchPriority="high"
+              className="block h-auto w-[11rem] max-w-full mx-auto mb-4"
             />
           </div>
           <SignIn />
