@@ -3,8 +3,10 @@ import { Timestamp } from "firebase/firestore";
 import { UserID } from "../../types";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import Loader from "@/components/loader";
-import { formatToGerman } from "@/utils/format";
+import { formatAmount } from "@/utils/format";
 import { AccountFlow } from "types";
+import { useLanguage } from "@/context/LanguageContext";
+import { useCurrency } from "@/context/CurrencyContext";
 import {
   getSavingLog,
   getSavingTotal,
@@ -34,6 +36,8 @@ import {
 } from "@/utils/calculations";
 
 const Savings = () => {
+  const { language, t } = useLanguage();
+  const { symbol } = useCurrency();
   const auth = getAuth();
   const [, setUser] = useState<User | null>(null);
   const [uid, setUid] = useState<UserID | null>(null);
@@ -186,9 +190,9 @@ const Savings = () => {
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
       <div className="flex justify-between items-center mb-4 px-2">
         <div className="text-start mb-4">
-          <h2 className="text-gray-400">Kontostand</h2>
+          <h2 className="text-gray-400">{t("balanceLabel")}</h2>
           <p className="text-gray-700 font-medium text-4xl">
-            {formatToGerman(parseFloat(totalAmount.toFixed(2)))} €
+            {formatAmount(parseFloat(totalAmount.toFixed(2)), language)} {symbol}
           </p>
         </div>
         <AlertDialog>
@@ -197,7 +201,7 @@ const Savings = () => {
               disabled={isResetDisabled}
               className="w-12 text-xs bg-transparent p-0 rounded-full border-red-500 text-red-500 hover:bg-red-500 hover:text-white  hover:border-none disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              RESET
+              {t("resetButton")}
             </button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -205,17 +209,16 @@ const Savings = () => {
               <AlertDialogTitle>
                 <div className="flex text-lg font-semibold justify-center items-center px-2">
                   <img className="w-10 h-10 mr-2" src={warning}></img>
-                  Möchtest du wirklich alles zurücksetzen?
+                  {t("resetAllQuestion")}
                 </div>
               </AlertDialogTitle>
               <AlertDialogDescription>
-                Deine Kontostand wird auf 0 gesetezt und alle Einträge werden
-                gelöscht.
+                {t("resetAllDescription")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Nein</AlertDialogCancel>
-              <AlertDialogAction onClick={handleReset}>Ja</AlertDialogAction>
+              <AlertDialogCancel>{t("noButton")}</AlertDialogCancel>
+              <AlertDialogAction onClick={handleReset}>{t("yesButton")}</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -223,7 +226,7 @@ const Savings = () => {
       <form onSubmit={handleSubmit}>
         <div className="flex justify-between items-center space-x-1 mt-0 gap-2">
           <label className="font-medium text-md text-left" htmlFor="reason">
-            Zweck
+            {t("reasonLabel")}
           </label>
           <input
             required
@@ -237,7 +240,7 @@ const Savings = () => {
         </div>
         <div className="flex justify-between items-center space-x-1 my-4 gap-2">
           <label className="font-medium text-md text-left" htmlFor="amount">
-            Betrag(€)
+            {t("amountLabel")} ({symbol})
           </label>
           <input
             type="number"
@@ -259,7 +262,7 @@ const Savings = () => {
             value="deposit"
             className="my-2 mr-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold p-1 w-32 rounded border-none"
           >
-            + Einzahlen
+            {t("depositButton")}
           </button>
           <button
             type="submit"
@@ -267,16 +270,16 @@ const Savings = () => {
             value="withdraw"
             className="my-2 ml-2 bg-red-500 hover:bg-red-600 text-white font-bold p-1 w-32 rounded border-none"
           >
-            - Entnehmen
+            {t("withdrawButton")}
           </button>
         </div>
       </form>
       <div className="container mx-auto py-4 text-gray-500">
         {savingLog.length === 0 ? (
-          <p>Keine Einträge vorhanden.</p>
+          <p>{t("noEntriesText")}</p>
         ) : (
           <DataTable
-            columns={getColumns(uid, handleDeleteLogItem)}
+            columns={getColumns(uid, handleDeleteLogItem, language, t, symbol)}
             data={savingLog}
           />
         )}

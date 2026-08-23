@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -30,6 +31,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const { t } = useLanguage();
   const [sorting, setSorting] = useState<SortingState>([
     { id: "createdOn", desc: true },
   ]);
@@ -76,7 +78,7 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Such nach Zweck oder Betrag . . ."
+          placeholder={t("searchPlaceholder")}
           value={globalFilter}
           onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
@@ -96,7 +98,12 @@ export function DataTable<TData, TValue>({
                     className="border border-none p-2 cursor-pointer"
                     onClick={header.column.getToggleSortingHandler()} // Enable sorting on click
                   >
-                    {header.column.columnDef.header as string}
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     {header.column.getIsSorted() === "asc"
                       ? " ▲"
                       : header.column.getIsSorted() === "desc"
@@ -130,7 +137,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Keine Ergebnisse.
+                  {t("noResultsText")}
                 </TableCell>
               </TableRow>
             )}
@@ -143,7 +150,7 @@ export function DataTable<TData, TValue>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Vorherige
+            {t("previousButton")}
           </Button>
           <Button
             variant="outline"
@@ -151,7 +158,7 @@ export function DataTable<TData, TValue>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Nächste
+            {t("nextButton")}
           </Button>
         </div>
       </div>

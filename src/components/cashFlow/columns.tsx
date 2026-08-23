@@ -11,45 +11,51 @@ import {
 import { deleteLogItem } from "../../firebase";
 import { AccountFlow } from "types";
 import clsx from "clsx";
-import { formatToGerman } from "@/utils/format";
+import { formatAmount } from "@/utils/format";
+import { Language, localeMap, reasonLabels, TranslationKey } from "@/i18n/translations";
 
 export const getColumns = (
   uid: string | null,
-  onDelete: (deletedItem: AccountFlow) => void // Accept delete callback
+  onDelete: (deletedItem: AccountFlow) => void, // Accept delete callback
+  language: Language,
+  t: (key: TranslationKey) => string,
+  currencySymbol: string
 ): ColumnDef<AccountFlow>[] => [
   {
     accessorKey: "createdOn",
-    header: "Datum",
+    header: t("dateHeader"),
     cell: (cell) => {
       const value = cell.getValue();
+      const locale = localeMap[language];
       if (value instanceof Timestamp) {
-        return value.toDate().toLocaleDateString("de-DE");
+        return value.toDate().toLocaleDateString(locale);
       }
       if (value instanceof Date) {
-        return value.toLocaleDateString("de-DE");
+        return value.toLocaleDateString(locale);
       }
       if (typeof value === "string") {
         const parsedDate = new Date(value);
         return !isNaN(parsedDate.getTime())
-          ? parsedDate.toLocaleDateString("de-DE")
-          : "Ungültiges Datum";
+          ? parsedDate.toLocaleDateString(locale)
+          : t("invalidDateText");
       }
-      return "Kein Datum";
+      return t("noDateText");
     },
   },
   {
     accessorKey: "reason",
-    header: "Zweck",
+    header: t("reasonHeader"),
     cell: (cell) => {
       const value = cell.getValue();
-      return typeof value === "string" && value.trim() !== ""
-        ? value
-        : "Kein Zweck";
+      if (typeof value !== "string" || value.trim() === "") {
+        return t("noReasonText");
+      }
+      return reasonLabels[language][value] ?? value;
     },
   },
   {
     accessorKey: "amount",
-    header: "Betrag(€)",
+    header: `${t("amountHeader")} (${currencySymbol})`,
     cell: ({ row }) => {
       const { amount, isPlus } = row.original;
 
@@ -60,7 +66,7 @@ export const getColumns = (
       return (
         <span className={clsx("font-bold", textColor)}>
           {sign}
-          {formatToGerman(amount)}
+          {formatAmount(amount, language)}
         </span>
       );
     },
@@ -93,11 +99,11 @@ export const getColumns = (
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="p-2">
             <DropdownMenuLabel>
-              Möchtest du diesen Betrag löschen?
+              {t("deleteAmountQuestion")}
             </DropdownMenuLabel>
             <div className="flex align-middle justify-end space-x-4">
-              <DropdownMenuItem onClick={handleDelete}>Ja</DropdownMenuItem>
-              <DropdownMenuItem>Nein</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete}>{t("yesButton")}</DropdownMenuItem>
+              <DropdownMenuItem>{t("noButton")}</DropdownMenuItem>
             </div>
           </DropdownMenuContent>
         </DropdownMenu>

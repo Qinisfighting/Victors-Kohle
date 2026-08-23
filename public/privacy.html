@@ -64,6 +64,26 @@
       .close-btn:hover {
         background: #e2e2e2;
       }
+      .lang-toggle {
+        display: inline-flex;
+        border: 1px solid #d0d0d0;
+        border-radius: 9999px;
+        overflow: hidden;
+        margin-bottom: 1.2rem;
+      }
+      .lang-toggle button {
+        border: none;
+        background: #ffffff;
+        color: #555;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 4px 12px;
+        cursor: pointer;
+      }
+      .lang-toggle button[aria-pressed="true"] {
+        background: #3b82f6;
+        color: #ffffff;
+      }
     </style>
   </head>
   <body>
@@ -72,94 +92,249 @@
         <a
           href="/"
           class="close-btn"
+          id="close-btn"
           aria-label="Schließen und zurück zur App"
           title="Zurück zur App"
           >✕</a
         >
-        <h1>Datenschutzerklärung</h1>
-        <p class="stand">Victors Kohle · Stand: August 2026</p>
+        <div class="lang-toggle" role="group" aria-label="Sprache / Language">
+          <button type="button" data-lang="de" aria-pressed="true">DE</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
 
-        <p>
-          Diese App hilft Kindern und Familien dabei, Taschengeld zu verwalten
-          und Sparziele zu verfolgen. Diese Erklärung beschreibt, welche Daten
-          dabei verarbeitet werden.
-        </p>
+        <div id="content-de">
+          <h1>Datenschutzerklärung</h1>
+          <p class="stand">Victors Kohle · Stand: August 2026</p>
 
-        <h2>Verantwortlicher</h2>
-        <p>
-          Yanqin Qualmann<br />
-          Kontakt und weitere Informationen:
-          <a
-            href="https://www.yanqin.de"
-            target="_blank"
-            rel="noopener noreferrer"
-            >www.yanqin.de</a
-          >
-        </p>
+          <p>
+            Diese App hilft Kindern und Familien dabei, Taschengeld zu
+            verwalten und Sparziele zu verfolgen. Diese Erklärung beschreibt,
+            welche Daten dabei verarbeitet werden.
+          </p>
 
-        <h2>Welche Daten werden verarbeitet</h2>
-        <ul>
-          <li>
-            <strong>Anmeldedaten:</strong> Die Anmeldung erfolgt über Google
-            Sign-In. Dabei werden Name, E-Mail-Adresse und Profilbild des
-            verwendeten Google-Kontos übermittelt und zur Identifikation
-            innerhalb der App genutzt.
-          </li>
-          <li>
-            <strong>Nutzungsdaten:</strong> Von dir eingegebene Taschengeld- und
-            Sparbeträge (z. B. wöchentliches Taschengeld, Ausgaben, Ein- und
-            Auszahlungen in die Spardose) werden gespeichert, um dir deinen
-            Kontostand und Verlauf anzuzeigen.
-          </li>
-        </ul>
+          <h2>Verantwortlicher</h2>
+          <p>
+            Yanqin Qualmann<br />
+            Kontakt und weitere Informationen:
+            <a
+              href="https://www.yanqin.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              >www.yanqin.de</a
+            >
+          </p>
 
-        <h2>Wie werden die Daten gespeichert</h2>
-        <p>
-          Alle Daten werden über Google Firebase (Authentication und Cloud
-          Firestore) gespeichert, einem Dienst von Google Ireland Limited /
-          Google LLC. Es gelten ergänzend die
-          <a
-            href="https://policies.google.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Datenschutzbestimmungen von Google</a
-          >.
-        </p>
+          <h2>Welche Daten werden verarbeitet</h2>
+          <ul>
+            <li>
+              <strong>Anmeldedaten:</strong> Die Anmeldung erfolgt über Google
+              Sign-In. Dabei werden Name, E-Mail-Adresse und Profilbild des
+              verwendeten Google-Kontos übermittelt und zur Identifikation
+              innerhalb der App genutzt.
+            </li>
+            <li>
+              <strong>Nutzungsdaten:</strong> Von dir eingegebene Taschengeld-
+              und Sparbeträge (z. B. wöchentliches Taschengeld, Ausgaben, Ein-
+              und Auszahlungen in die Spardose) werden gespeichert, um dir
+              deinen Kontostand und Verlauf anzuzeigen.
+            </li>
+          </ul>
 
-        <h2>Was nicht passiert</h2>
-        <ul>
-          <li>Es wird keine Werbung angezeigt.</li>
-          <li>Es werden keine Analyse- oder Tracking-Dienste eingebunden.</li>
-          <li>
-            Deine Daten werden nicht verkauft oder an Dritte zu Werbezwecken
-            weitergegeben.
-          </li>
-        </ul>
+          <h2>Wie werden die Daten gespeichert</h2>
+          <p>
+            Alle Daten werden über Google Firebase (Authentication und Cloud
+            Firestore) gespeichert, einem Dienst von Google Ireland Limited /
+            Google LLC. Es gelten ergänzend die
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Datenschutzbestimmungen von Google</a
+            >.
+          </p>
 
-        <h2>Speicherdauer und Löschung</h2>
-        <p>
-          Deine Daten bleiben gespeichert, solange dein Konto besteht. Wenn du
-          die Löschung deines Kontos und aller gespeicherten Daten wünschst,
-          kontaktiere uns über
-          <a
-            href="https://www.yanqin.de"
-            target="_blank"
-            rel="noopener noreferrer"
-            >www.yanqin.de</a
-          >.
-        </p>
+          <h2>Was nicht passiert</h2>
+          <ul>
+            <li>Es wird keine Werbung angezeigt.</li>
+            <li>Es werden keine Analyse- oder Tracking-Dienste eingebunden.</li>
+            <li>
+              Deine Daten werden nicht verkauft oder an Dritte zu
+              Werbezwecken weitergegeben.
+            </li>
+          </ul>
 
-        <h2>Hinweis für Familien</h2>
-        <p>
-          Victors Kohle ist für die gemeinsame Nutzung durch Kinder und ihre
-          Erziehungsberechtigten gedacht. Die Anmeldung erfolgt ausschließlich
-          über das Google-Konto eines Erziehungsberechtigten – Kinder legen
-          kein eigenes Konto an und melden sich nicht selbstständig an. Die
-          App wird gemeinsam mit einem Erziehungsberechtigten oder unter
-          dessen Aufsicht genutzt, der auch über die Weitergabe des Zugangs
-          an das Kind entscheidet.
-        </p>
+          <h2>Speicherdauer und Löschung</h2>
+          <p>
+            Deine Daten bleiben gespeichert, solange dein Konto besteht. Wenn
+            du die Löschung deines Kontos und aller gespeicherten Daten
+            wünschst, kontaktiere uns über
+            <a
+              href="https://www.yanqin.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              >www.yanqin.de</a
+            >.
+          </p>
+
+          <h2>Hinweis für Familien</h2>
+          <p>
+            Victors Kohle ist für die gemeinsame Nutzung durch Kinder und
+            ihre Erziehungsberechtigten gedacht. Die Anmeldung erfolgt
+            ausschließlich über das Google-Konto eines Erziehungsberechtigten
+            – Kinder legen kein eigenes Konto an und melden sich nicht
+            selbstständig an. Die App wird gemeinsam mit einem
+            Erziehungsberechtigten oder unter dessen Aufsicht genutzt, der
+            auch über die Weitergabe des Zugangs an das Kind entscheidet.
+          </p>
+        </div>
+
+        <div id="content-en" hidden>
+          <h1>Privacy Policy</h1>
+          <p class="stand">Victors Kohle · Last updated: August 2026</p>
+
+          <p>
+            This app helps children and families manage pocket money and
+            track savings goals. This policy describes what data is
+            processed along the way.
+          </p>
+
+          <h2>Data Controller</h2>
+          <p>
+            Yanqin Qualmann<br />
+            Contact and further information:
+            <a
+              href="https://www.yanqin.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              >www.yanqin.de</a
+            >
+          </p>
+
+          <h2>What data is processed</h2>
+          <ul>
+            <li>
+              <strong>Sign-in data:</strong> Sign-in is done via Google
+              Sign-In. This transmits the name, email address, and profile
+              picture of the Google account used, which are used to identify
+              you within the app.
+            </li>
+            <li>
+              <strong>Usage data:</strong> Pocket-money and savings amounts
+              you enter (e.g. weekly pocket money, expenses, deposits and
+              withdrawals into the piggy bank) are stored so we can show you
+              your balance and history.
+            </li>
+          </ul>
+
+          <h2>How the data is stored</h2>
+          <p>
+            All data is stored via Google Firebase (Authentication and Cloud
+            Firestore), a service provided by Google Ireland Limited /
+            Google LLC. Google's
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              >privacy policy</a
+            >
+            applies in addition.
+          </p>
+
+          <h2>What does not happen</h2>
+          <ul>
+            <li>No advertising is shown.</li>
+            <li>No analytics or tracking services are integrated.</li>
+            <li>
+              Your data is not sold or shared with third parties for
+              advertising purposes.
+            </li>
+          </ul>
+
+          <h2>Data retention and deletion</h2>
+          <p>
+            Your data remains stored for as long as your account exists. If
+            you would like your account and all stored data deleted, please
+            contact us via
+            <a
+              href="https://www.yanqin.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              >www.yanqin.de</a
+            >.
+          </p>
+
+          <h2>Note for families</h2>
+          <p>
+            Victors Kohle is intended for joint use by children and their
+            parents or legal guardians. Sign-in is only possible via a
+            parent's or guardian's Google account – children do not create
+            their own account and do not sign in on their own. The app is
+            used together with a parent or guardian, or under their
+            supervision, and it is the parent or guardian who decides
+            whether to share access with the child.
+          </p>
+        </div>
       </div>
     </main>
+    <script>
+      (function () {
+        var STORAGE_KEY = "language";
+        var closeBtn = document.getElementById("close-btn");
+        var deContent = document.getElementById("content-de");
+        var enContent = document.getElementById("content-en");
+        var buttons = document.querySelectorAll(".lang-toggle button");
+
+        var texts = {
+          de: {
+            title: "Datenschutzerklärung – Victors Kohle",
+            closeLabel: "Schließen und zurück zur App",
+            closeTitle: "Zurück zur App",
+          },
+          en: {
+            title: "Privacy Policy – Victors Kohle",
+            closeLabel: "Close and return to the app",
+            closeTitle: "Back to the app",
+          },
+        };
+
+        function readStoredLanguage() {
+          try {
+            var stored = window.localStorage.getItem(STORAGE_KEY);
+            return stored === "en" ? "en" : "de";
+          } catch (e) {
+            return "de";
+          }
+        }
+
+        function applyLanguage(lang) {
+          document.documentElement.lang = lang;
+          document.title = texts[lang].title;
+          deContent.hidden = lang !== "de";
+          enContent.hidden = lang !== "en";
+          closeBtn.setAttribute("aria-label", texts[lang].closeLabel);
+          closeBtn.setAttribute("title", texts[lang].closeTitle);
+          buttons.forEach(function (button) {
+            button.setAttribute(
+              "aria-pressed",
+              button.getAttribute("data-lang") === lang ? "true" : "false"
+            );
+          });
+        }
+
+        buttons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            var lang = button.getAttribute("data-lang");
+            try {
+              window.localStorage.setItem(STORAGE_KEY, lang);
+            } catch (e) {
+              // localStorage unavailable; selection just won't persist.
+            }
+            applyLanguage(lang);
+          });
+        });
+
+        applyLanguage(readStoredLanguage());
+      })();
+    </script>
   </body>
 </html>

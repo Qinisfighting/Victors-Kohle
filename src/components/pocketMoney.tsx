@@ -23,15 +23,24 @@ import { TGFormData, UserID } from "../../types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { addWeeklyLeftIntoSaving, db } from "../firebase.ts";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { formatToGerman } from "@/utils/format";
+import {
+  formatAmount,
+  toCanonicalNumberString,
+  toDisplayNumberString,
+} from "@/utils/format";
 import { useToast } from "@/hooks/use-toast";
 import { getSavingTotal } from "../firebase";
 import {
   calculateRemainingAmount,
   validatePocketMoneyCalculation,
 } from "@/utils/calculations";
+import { useLanguage } from "@/context/LanguageContext";
+import { useCurrency } from "@/context/CurrencyContext";
+import { errorMessages, praiseMessages, weekdayLabels } from "@/i18n/translations";
 
 const PocketMoney = () => {
+  const { language, t } = useLanguage();
+  const { symbol } = useCurrency();
   const weekdays = [
     "Montag",
     "Dienstag",
@@ -49,8 +58,9 @@ const PocketMoney = () => {
   const [result, setResult] = useState<string>("");
   const [isResultCorrect, setIsResultCorrect] = useState<boolean>(false);
   const [startingAmount, setStartingAmount] = useState<string>("");
-  const [displayStartingAmount, setDisplayStartingAmount] =
-    useState<string>("0,00");
+  const [displayStartingAmount, setDisplayStartingAmount] = useState<string>(
+    () => formatAmount(0, language)
+  );
   const [currentAmount, setCurrentAmount] = useState(0);
   const [expensesList, setExpensesList] = useState<TGFormData[]>([
     { day: "", expense: null, createdOn: Timestamp.now() },
@@ -118,7 +128,9 @@ const PocketMoney = () => {
             const data = docSnap.data() as { startingAmount: string };
             setStartingAmount(data.startingAmount);
             setCurrentAmount(parseFloat(data.startingAmount));
-            setDisplayStartingAmount(data.startingAmount.replace(".", ","));
+            setDisplayStartingAmount(
+              toDisplayNumberString(data.startingAmount, language)
+            );
           } else {
             console.log("No such document for user!");
           }
@@ -129,7 +141,18 @@ const PocketMoney = () => {
 
       fetchStartingAmount();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
+
+  // Reformat the displayed starting amount when the language (decimal separator) changes.
+  useEffect(() => {
+    setDisplayStartingAmount(
+      startingAmount
+        ? toDisplayNumberString(startingAmount, language)
+        : formatAmount(0, language)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
 
   useEffect(() => {
     const fetchTotalAmount = async () => {
@@ -162,7 +185,7 @@ const PocketMoney = () => {
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setDisplayStartingAmount(e.target.value);
-    const newAmount = e.target.value.replace(",", ".");
+    const newAmount = toCanonicalNumberString(e.target.value, language);
     setStartingAmount(newAmount);
     if (uid) {
       try {
@@ -222,37 +245,13 @@ const PocketMoney = () => {
   }, [uid]);
 
   const getRandomErrAlert = () => {
-    const messages = [
-      "Ups, das war leider nicht ganz richtig. Versuch es doch nochmal!",
-      "Deine Berechnung stimmt nicht ganz. Denk nochmal nach und probier es erneut!",
-      "Fast richtig, aber noch nicht ganz. Gib dir einen Moment und versuch’s nochmal!",
-      "Das Ergebnis passt noch nicht. Probier es einfach nochmal in Ruhe!",
-      "Huch, da hat sich ein kleiner Fehler eingeschlichen. Versuch es doch nochmal!",
-      "Nicht schlimm, das war ein guter Versuch! Versuch es einfach noch einmal!",
-      "Deine Berechnung ist leider nicht korrekt. Versuch es nochmal, du kannst das!",
-      "Das Ergebnis ist noch nicht richtig. Versuch’s nochmal, ich glaube an dich!",
-      "Schade, das war knapp daneben. Versuch es nochmal, du schaffst das!",
-      "Deine Antwort ist leider falsch. Aber kein Problem, probier es einfach noch einmal!",
-    ];
-
+    const messages = errorMessages[language];
     const randomIndex = Math.floor(Math.random() * messages.length);
     return messages[randomIndex];
   };
 
   const getRandomPraise = () => {
-    const messages = [
-      "Super gemacht, das war genau richtig!",
-      "Klasse, du hast die Aufgabe perfekt gelöst!",
-      "Richtig gerechnet, das war spitze!",
-      "Toll, du hast das wunderbar gelöst!",
-      "Fantastisch, deine Antwort ist absolut korrekt!",
-      "Bravo, du bist ein Mathe-Champion!",
-      "Ausgezeichnet! Deine Berechnung stimmt!",
-      "Wow, das war richtig gut! Weiter so!",
-      "Du hast das großartig gemacht, alles richtig!",
-      "Herzlichen Glückwunsch, das Ergebnis ist perfekt!",
-    ];
-
+    const messages = praiseMessages[language];
     const randomIndex = Math.floor(Math.random() * messages.length);
     return messages[randomIndex];
   };
@@ -265,7 +264,7 @@ const PocketMoney = () => {
     );
 
     if (calculation.status === "invalid") {
-      setAlertMessage("Gib bitte eine gültige Zahl ein.");
+      setAlertMessage(t("invalidNumberAlert"));
       setAlertType("error");
       return;
     }
@@ -379,8 +378,8 @@ const PocketMoney = () => {
 
   const showCurrentAmount = () => {
     return isNaN(currentAmount)
-      ? "0,00"
-      : formatToGerman(parseFloat(currentAmount.toFixed(2)));
+      ? formatAmount(0, language)
+      : formatAmount(parseFloat(currentAmount.toFixed(2)), language);
   };
 
   useEffect(() => {
@@ -405,14 +404,15 @@ const PocketMoney = () => {
       setTotalAmount(total);
 
       toast({
-        title: "Das Geld ist im Sparschwein gelandet!",
+        title: t("piggyBankToastTitle"),
         description: (
           <span>
-            Du hast jetzt{" "}
+            {t("youNowHaveText")}{" "}
             <strong style={{ fontSize: "1.2em" }}>
-              {formatToGerman(parseFloat(total.toFixed(2)))}€
+              {formatAmount(parseFloat(total.toFixed(2)), language)}
+              {symbol}
             </strong>{" "}
-            in deinem Sparkonto!
+            {t("inYourSavingsAccountText")}
           </span>
         ),
         variant: "default",
@@ -532,10 +532,10 @@ const PocketMoney = () => {
         )}
       </div>
       <div className="flex items-center space-x-4 mb-4">
-        <label className="font-medium mb-2 w-1/2 text-left">Einkommen(€)</label>
+        <label className="font-medium mb-2 w-1/2 text-left">{t("incomeLabel")} ({symbol})</label>
         <Input
           type="text"
-          placeholder="Startbetrag?"
+          placeholder={t("startingAmountPlaceholder")}
           value={displayStartingAmount}
           onClick={() => setDisplayStartingAmount("")}
           // value={startingAmount}
@@ -554,10 +554,15 @@ const PocketMoney = () => {
                 className="w-auto flex justify-between items-center bg-gray-100 px-2 rounded-lg mb-1"
               >
                 <div className="flex justify-between items-center w-5/6">
-                  <span className="">{item.day} </span>
+                  <span className="">
+                    {weekdayLabels[language][item.day] ?? item.day}{" "}
+                  </span>
                   <span className="">
                     -{" "}
-                    {formatToGerman(parseFloat((item.expense ?? 0).toFixed(2)))}
+                    {formatAmount(
+                      parseFloat((item.expense ?? 0).toFixed(2)),
+                      language
+                    )}
                   </span>
                 </div>
                 <button
@@ -573,7 +578,7 @@ const PocketMoney = () => {
 
       {/* Current Amount */}
       <div className="flex items-center  space-x-4 mb-4">
-        <span className="font-medium mb-2 w-1/3 text-left">Kontonstand(€)</span>
+        <span className="font-medium mb-2 w-1/3 text-left">{t("accountBalanceLabel")} ({symbol})</span>
         <span className="w-1/3 text-right font-semibold">
           {showCurrentAmount()}
         </span>
@@ -588,24 +593,23 @@ const PocketMoney = () => {
                   <img
                     src={coinincrease}
                     className="m-auto p-0"
-                    title="Sparschwein"
+                    title={t("piggyBankTitle")}
                   />
                 </button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    Möchtest du das Geld in dein Sparschwein tun?
+                    {t("moveToPiggyBankQuestion")}
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Deine wöchentliche Ausgabenliste wird gelöscht und der
-                    aktuelle Kontostand auf 0 gesetzt.
+                    {t("moveToPiggyBankDescription")}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Nein</AlertDialogCancel>
+                  <AlertDialogCancel>{t("noButton")}</AlertDialogCancel>
                   <AlertDialogAction onClick={handlePigClick}>
-                    Ja
+                    {t("yesButton")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -616,23 +620,22 @@ const PocketMoney = () => {
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <button className="w-6 h-6 bg-transparent border-none p-0 mr-2 hover:animate-shakeUp hover:border-none disabled:opacity-50 disabled:cursor-not-allowed">
-                  <img src={reset} className="m-auto p-0" title="Reset" />
+                  <img src={reset} className="m-auto p-0" title={t("resetTitle")} />
                 </button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    Möchtest du in die neue Woche starten?
+                    {t("startNewWeekQuestion")}
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Deine aktuelle Ausgabenliste und dein Einkommen werden auf
-                    den Anfangsstand zurückgesetzt.
+                    {t("startNewWeekDescription")}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Nein</AlertDialogCancel>
+                  <AlertDialogCancel>{t("noButton")}</AlertDialogCancel>
                   <AlertDialogAction onClick={handleReset}>
-                    Ja
+                    {t("yesButton")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -649,13 +652,13 @@ const PocketMoney = () => {
         >
           {weekdays.map((day) => (
             <option key={day} value={day}>
-              {day}
+              {weekdayLabels[language][day] ?? day}
             </option>
           ))}
         </select>
         <Input
           type="text"
-          placeholder="€ Ausgaben"
+          placeholder={`${symbol} ${t("expensePlaceholder")}`}
           onClick={() => setDailyExpense("")}
           value={dailyExpense}
           onChange={(e) => setDailyExpense(e.target.value)}
@@ -663,10 +666,10 @@ const PocketMoney = () => {
         />
       </div>
       <div className="flex items-center space-x-4 mb-4">
-        <label className="font-medium mb-2 w-1/2 text-left">Ergebnis(€)</label>
+        <label className="font-medium mb-2 w-1/2 text-left">{t("resultLabel")} ({symbol})</label>
         <Input
           type="text"
-          placeholder="Wie viel bleibt?"
+          placeholder={t("resultPlaceholder")}
           value={result}
           onClick={() => setResult("")}
           onChange={(e) => setResult(e.target.value)}
@@ -679,7 +682,7 @@ const PocketMoney = () => {
         onClick={handleCalculate}
         className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Ergebnis prüfen
+        {t("checkResultButton")}
       </button>
     </div>
   );

@@ -10,6 +10,13 @@
 
 /* ... */
 
+/* Reserve the scrollbar gutter permanently so opening a Radix dropdown/dialog
+   (which temporarily hides the page scrollbar) doesn't widen the viewport and
+   shift `position: fixed; right: …` elements, e.g. the language/currency toggles. */
+html {
+  scrollbar-gutter: stable;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
